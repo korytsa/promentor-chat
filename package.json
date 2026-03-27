@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "mf:serve": "pnpm build && pnpm preview --host localhost --port 4174 --strictPort"
   },
   "dependencies": {
     "react": "^19.0.0",
