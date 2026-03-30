@@ -10,12 +10,21 @@
     "mf:serve": "pnpm build && pnpm preview --host localhost --port 4174 --strictPort"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.72.0",
+    "react-router-dom": "^7.13.2",
+    "tailwindcss": "^4.2.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@originjs/vite-plugin-federation": "^1.4.1",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^6.0.2",
     "vite": "^6.4.1"
   }
 }
