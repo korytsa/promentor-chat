@@ -1,1 +1,2 @@
-export { default as ChatPage } from "./ui/Page";
+import "../../app/index.css";
+export { default } from "./ui/Page";

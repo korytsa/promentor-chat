@@ -1,4 +1,3 @@
-import "../../app/index.css";
 import { CONVERSATIONS, MESSAGES } from "../model/constants";
 
 

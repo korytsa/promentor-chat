@@ -12,7 +12,7 @@ export default defineConfig({
       filename: "remoteEntry.js",
       exposes: {
         "./App": "./src/app/App.tsx",
-        "./ChatPage": "./src/pages/chat/ui/Page.tsx",
+        "./ChatPage": "./src/pages/chat/index.ts",
       },
       shared: ["react", "react-dom"],
     }),
