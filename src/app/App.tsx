@@ -5,7 +5,7 @@ import ChatPage from "../pages/chat";
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-slate-900">
+      <div className="min-h-screen bg-slate-900 pt-10">
       <Routes>
         <Route path="/" element={<ChatPage />} />
       </Routes>
