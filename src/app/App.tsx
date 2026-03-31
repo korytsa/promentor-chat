@@ -6,9 +6,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-slate-900 pt-10">
-      <Routes>
-        <Route path="/" element={<ChatPage />} />
-      </Routes>
+        <Routes>
+          <Route path="/" element={<ChatPage />} />
+        </Routes>
       </div>
     </BrowserRouter>
   );

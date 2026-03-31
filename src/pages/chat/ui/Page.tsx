@@ -1,6 +1,5 @@
 import { CONVERSATIONS, MESSAGES } from "../model/constants";
 
-
 export default function ChatPage() {
   return (
     <main className="min-h-screen text-slate-100">
@@ -39,7 +38,10 @@ export default function ChatPage() {
               const isUser = message.role === "user";
 
               return (
-                <div key={message.id} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+                <div
+                  key={message.id}
+                  className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+                >
                   <div
                     className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                       isUser
