@@ -11,7 +11,6 @@ export default defineConfig({
       name: "chatApp",
       filename: "remoteEntry.js",
       exposes: {
-        "./App": "./src/app/App.tsx",
         "./ChatPage": "./src/pages/chat/index.ts",
       },
       shared: ["react", "react-dom"],
