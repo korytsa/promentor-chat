@@ -13,7 +13,7 @@ export default defineConfig({
       exposes: {
         "./ChatPage": "./src/pages/chat/index.ts",
       },
-      shared: ["react", "react-dom"],
+      shared: ["react", "react-dom", "react-router-dom"],
     }),
   ],
   server: {
