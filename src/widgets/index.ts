@@ -1,2 +1,1 @@
-export { ChatLayout } from "./chat/ChatLayout";
-export { ChatSidebar } from "./chat/ChatSidebar";
+export { default as ChatSidebar } from "./chat-sidebar/ChatSidebar";

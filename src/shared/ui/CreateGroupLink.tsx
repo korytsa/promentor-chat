@@ -26,7 +26,7 @@ export function CreateGroupLink({
 }: CreateGroupLinkProps) {
   return (
     <Link
-      to="/create-group"
+      to="/chat/create-group"
       className={[
         baseClassName,
         variantClassName[variant],

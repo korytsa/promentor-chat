@@ -65,7 +65,7 @@ export default function CreateGroupPage() {
   }, []);
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col rounded-r-lg border border-white/20 p-6">
+    <section className="flex min-h-0 flex-1 flex-col rounded-r-lg border border-white/20 p-4">
       <div className="rounded-lg border border-white/20 bg-white/3 p-6">
         <h1 className="text-2xl font-semibold text-[#eff5ff]">Create Group</h1>
         <p className="mt-2 text-sm text-[#9bb4df]">

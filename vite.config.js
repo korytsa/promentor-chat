@@ -11,7 +11,11 @@ export default defineConfig({
       name: "chatApp",
       filename: "remoteEntry.js",
       exposes: {
-        "./ChatPage": "./src/pages/chat/index.ts",
+        "./ChatEmptyPage": "./src/pages/empty-chat/index.ts",
+        "./ChatConversationPage": "./src/pages/chat/index.ts",
+        "./ChatCreateGroupPage": "./src/pages/create-group/index.ts",
+        "./ChatProfilePage": "./src/pages/profile/index.ts",
+        "./ChatSidebar": "./src/widgets/chat-sidebar/ChatSidebar.tsx",
       },
       shared: ["react", "react-dom", "react-router-dom"],
     }),

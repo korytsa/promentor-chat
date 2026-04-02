@@ -1,15 +1,12 @@
+import "../../index.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { SEARCH_USERS, type Conversation } from "../../entities/chat";
+import { CONVERSATIONS, SEARCH_USERS, type Conversation } from "../../entities/chat";
 import { CURRENT_USER_PROFILE } from "../../entities/profile";
 import { useMemo, useRef, useState } from "react";
 import { useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Avatar } from "../../shared/ui/Avatar";
 import { CreateGroupLink } from "../../shared/ui/CreateGroupLink";
-
-type ChatSidebarProps = {
-  conversations: Conversation[];
-};
 
 function ConversationAvatar({ conversation }: { conversation: Conversation }) {
   if (conversation.category === "group") {
@@ -37,11 +34,13 @@ function ConversationAvatar({ conversation }: { conversation: Conversation }) {
   );
 }
 
-export function ChatSidebar({ conversations }: ChatSidebarProps) {
-  const directMessages = conversations.filter(
+export default function ChatSidebar() {
+
+
+  const directMessages = CONVERSATIONS.filter(
     (conversation) => conversation.category === "direct",
   );
-  const groupMessages = conversations.filter(
+  const groupMessages = CONVERSATIONS.filter(
     (conversation) => conversation.category === "group",
   );
 
@@ -96,7 +95,7 @@ export function ChatSidebar({ conversations }: ChatSidebarProps) {
     <div className="hidden w-[280px] flex-col gap-5 rounded-l-lg border border-r-0 border-white/20 p-2 lg:flex">
       <section className="border-b border-white/20 pb-2">
         <Link
-          to="/profile"
+          to="/chat/profile"
           className="flex items-center gap-3"
         >
           <Avatar

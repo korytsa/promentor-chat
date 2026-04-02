@@ -13,12 +13,12 @@ export default function ProfilePage() {
   const navigate = useNavigate();
 
   if (slug === CURRENT_USER_SLUG) {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to="/chat/profile" replace />;
   }
 
   const profile = resolveProfile(slug);
   if (!profile) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/chat" replace />;
   }
 
   const isOwnProfile = !slug;
@@ -39,7 +39,7 @@ export default function ProfilePage() {
   };
 
   const handleEditProfile = () => {
-    navigate("/profile");
+    navigate("/chat/profile");
   };
 
   return (
