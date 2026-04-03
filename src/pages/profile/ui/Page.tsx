@@ -102,7 +102,7 @@ function ProfileContact({
       </div>
       <button
         type="button"
-        className="mt-4 w-full rounded-lg border border-[#2a6de5] bg-[#1a3f85] px-4 py-2 text-sm font-semibold !text-[#e7f0ff] shadow-[0_8px_20px_rgba(13,47,109,0.35)] transition hover:bg-[#2456b2]"
+        className="mt-4 w-full rounded-lg border border-[#2a6de5] bg-[#1a3f85] px-4 py-2 text-sm font-semibold text-[#e7f0ff]! shadow-[0_8px_20px_rgba(13,47,109,0.35)] transition hover:bg-[#2456b2]"
         onClick={onSendMessage}
       >
         Send Message
