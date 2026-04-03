@@ -3,6 +3,8 @@
 :root {
   --pm-bg: #030712;
   --pm-text-primary: #f8fafc;
+  --pm-text-secondary: #cbd5e1;
+  --pm-text-muted: #94a3b8;
   --pm-bg-radial-1: rgba(56, 189, 248, 0.24);
   --pm-bg-radial-2: rgba(59, 130, 246, 0.18);
   --pm-bg-radial-3: rgba(14, 165, 233, 0.16);
@@ -15,6 +17,8 @@
 [data-theme="light"] {
   --pm-bg: #f4f8ff;
   --pm-text-primary: #0f172a;
+  --pm-text-secondary: #334155;
+  --pm-text-muted: #64748b;
   --pm-bg-radial-1: rgba(56, 189, 248, 0.18);
   --pm-bg-radial-2: rgba(59, 130, 246, 0.13);
   --pm-bg-radial-3: rgba(14, 165, 233, 0.08);
@@ -46,5 +50,13 @@ body {
 @layer utilities {
   .pm-text-primary {
     color: var(--pm-text-primary);
+  }
+
+  .pm-text-secondary {
+    color: var(--pm-text-secondary);
+  }
+
+  .pm-text-muted {
+    color: var(--pm-text-muted);
   }
 }

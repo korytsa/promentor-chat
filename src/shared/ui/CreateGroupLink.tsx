@@ -13,10 +13,8 @@ const baseClassName =
 
 const variantClassName: Record<NonNullable<CreateGroupLinkProps["variant"]>, string> =
   {
-    empty:
-      "mt-7 w-full hover:bg-white/10 md:w-[280px]",
-    sidebar:
-      "mb-7 w-full hover:bg-white/10",
+    empty:"w-full hover:bg-white/10 md:w-[280px]",
+    sidebar:"w-full hover:bg-white/10",
   };
 
 export function CreateGroupLink({

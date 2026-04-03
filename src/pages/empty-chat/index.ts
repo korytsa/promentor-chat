@@ -1,3 +1,3 @@
 import "../../index.css";
 
-export { default } from "./Page";
+export { default } from "./ui/Page";

@@ -1,93 +1,44 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { SEARCH_USERS } from "../../../entities/chat";
+import { Typography } from "@promentorapp/ui-kit";
 import { Avatar } from "../../../shared/ui/Avatar";
+import { CREATE_GROUP_PAGE_COPY } from "../model/constants";
+import { useCreateGroupPage } from "../model/useCreateGroupPage";
 
 export default function CreateGroupPage() {
-  const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
-  const [query, setQuery] = useState("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const selectorRef = useRef<HTMLDivElement | null>(null);
-
-  const filteredMembers = useMemo(
-    () =>
-      SEARCH_USERS.filter((member) =>
-        member.name.toLowerCase().includes(query.trim().toLowerCase()),
-      ),
-    [query],
-  );
-
-  const selectedMembers = useMemo(
-    () =>
-      SEARCH_USERS.filter((member) => selectedMemberIds.includes(member.id)),
-    [selectedMemberIds],
-  );
-
-  const closeSelectorIfEmpty = (memberIds: string[]) => {
-    if (memberIds.length === 0) {
-      setIsDropdownOpen(false);
-      setQuery("");
-    }
-  };
-
-  const toggleMember = (memberId: string) => {
-    setSelectedMemberIds((current) => {
-      const isSelected = current.includes(memberId);
-      const nextSelectedMemberIds = isSelected
-        ? current.filter((id) => id !== memberId)
-        : [...current, memberId];
-
-      closeSelectorIfEmpty(nextSelectedMemberIds);
-      return nextSelectedMemberIds;
-    });
-  };
-
-  const removeMember = (memberId: string) => {
-    setSelectedMemberIds((current) => {
-      const nextSelectedMemberIds = current.filter((id) => id !== memberId);
-      closeSelectorIfEmpty(nextSelectedMemberIds);
-      return nextSelectedMemberIds;
-    });
-  };
-
-  useEffect(() => {
-    const onDocumentMouseDown = (event: MouseEvent) => {
-      if (!selectorRef.current) {
-        return;
-      }
-
-      if (!selectorRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", onDocumentMouseDown);
-    return () => document.removeEventListener("mousedown", onDocumentMouseDown);
-  }, []);
+  const {
+    selectorRef,
+    query,
+    onQueryChange,
+    isDropdownOpen,
+    selectedMemberIds,
+    selectedMembers,
+    filteredMembers,
+    toggleMember,
+    removeMember,
+    onSelectorAreaClick,
+  } = useCreateGroupPage();
 
   return (
     <section className="flex min-h-0 flex-1 flex-col rounded-r-lg border border-white/20 p-4">
-      <div className="rounded-lg border border-white/20 bg-white/3 p-6">
-        <h1 className="text-2xl font-semibold text-[#eff5ff]">Create Group</h1>
-        <p className="mt-2 text-sm text-[#9bb4df]">
-          Set up a new group conversation and invite your team members.
-        </p>
-
-        <div className="mt-6 grid gap-4">
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-[#deebff]">Group name</span>
+      <div className="rounded-lg border border-white/20 bg-white/3 p-4">
+        <Typography variant="h5"variantStyle="title">{CREATE_GROUP_PAGE_COPY.title}</Typography>
+        <Typography variantStyle="caption">{CREATE_GROUP_PAGE_COPY.subtitle}</Typography>
+        
+        <div className="mt-4 grid gap-4">
+          <div className="grid gap-2">
+            <Typography variantStyle="label">{CREATE_GROUP_PAGE_COPY.groupNameLabel}</Typography>
             <input
               type="text"
-              placeholder="e.g. Product Launch Squad"
+              placeholder={CREATE_GROUP_PAGE_COPY.groupNamePlaceholder}
               className="h-11 rounded-lg border border-white/20 bg-transparent px-3 text-sm text-[#eaf2ff] outline-none placeholder:text-[#88a2d2] focus:border-[#2a6de5]"
             />
-          </label>
+          </div>
 
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-[#deebff]">Invite members</span>
+          <div className="grid gap-2">
+            <Typography variantStyle="label">{CREATE_GROUP_PAGE_COPY.inviteMembersLabel}</Typography>
             <div
               ref={selectorRef}
               className="rounded-lg border border-[#7ec5ff] bg-transparent"
-              onClick={() => setIsDropdownOpen(true)}
+              onClick={onSelectorAreaClick}
             >
               <div className="flex min-h-[52px] items-center gap-2 px-3 py-2">
                 <div className="hide-scrollbar flex max-h-[70px] flex-1 flex-wrap gap-2 overflow-y-auto pr-1">
@@ -101,18 +52,15 @@ export default function CreateGroupPage() {
                         user={{ name: member.name, avatarUrl: member.avatarUrl }}
                         size="sm"
                       />
-                      <span>{member.name}</span>
+                      <Typography component="span" variantStyle="label">{member.name}</Typography>
                     </button>
                   ))}
 
                   <input
                     type="text"
                     value={query}
-                    onChange={(event) => {
-                      setQuery(event.target.value);
-                      setIsDropdownOpen(true);
-                    }}
-                    placeholder={selectedMembers.length ? "" : "Type names..."}
+                    onChange={(event) => onQueryChange(event.target.value)}
+                    placeholder={selectedMembers.length ? "" : CREATE_GROUP_PAGE_COPY.inviteInputPlaceholder}
                     className="h-8 min-w-[160px] flex-1 bg-transparent text-sm text-[#eaf2ff] outline-none placeholder:text-[#88a2d2]"
                   />
                 </div>
@@ -135,29 +83,31 @@ export default function CreateGroupPage() {
                             : "border-white/12 bg-white/8 text-[#e3ebf7] hover:bg-white/12",
                         ].join(" ")}
                       >
-                        <span className="flex items-center gap-3 text-base">
+                        <Typography component="span" variantStyle="label" className="flex items-center gap-3">
                           <Avatar
                             user={{ name: member.name, avatarUrl: member.avatarUrl }}
                             size="sm"
                           />
-                          <span>{member.name}</span>
-                        </span>
-                        {isSelected ? <span className="text-xs text-[#9ed3ff]">Selected</span> : null}
+                          <Typography component="span" variantStyle="body">{member.name}</Typography>
+                        </Typography>
+                        {isSelected ? (
+                          <Typography component="span" variantStyle="caption">{CREATE_GROUP_PAGE_COPY.selectedBadge}</Typography>
+                        ) : null}
                       </button>
                     );
                   })}
                 </div>
               ) : null}
             </div>
-          </label>
+          </div>
         </div>
 
         <div className="mt-6 flex items-center gap-3">
           <button className="rounded-lg border border-[#2a6de5] bg-[#1b4fae] px-4 py-2 text-sm font-semibold text-[#eff5ff] transition hover:bg-[#2362d4]">
-            Create group
+            {CREATE_GROUP_PAGE_COPY.createButton}
           </button>
           <button className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-[#cfe0ff] transition hover:border-white/30 hover:bg-white/5">
-            Cancel
+            {CREATE_GROUP_PAGE_COPY.cancelButton}
           </button>
         </div>
       </div>
