@@ -20,9 +20,11 @@ export default function CreateGroupPage() {
   return (
     <section className="flex min-h-0 flex-1 flex-col rounded-r-lg border border-white/20 p-4">
       <div className="rounded-lg border border-white/20 bg-white/3 p-4">
-        <Typography variant="h5"variantStyle="title">{CREATE_GROUP_PAGE_COPY.title}</Typography>
+        <Typography variant="h5" variantStyle="title">
+          {CREATE_GROUP_PAGE_COPY.title}
+        </Typography>
         <Typography variantStyle="caption">{CREATE_GROUP_PAGE_COPY.subtitle}</Typography>
-        
+
         <div className="mt-4 grid gap-4">
           <div className="grid gap-2">
             <Typography variantStyle="label">{CREATE_GROUP_PAGE_COPY.groupNameLabel}</Typography>
@@ -34,7 +36,9 @@ export default function CreateGroupPage() {
           </div>
 
           <div className="grid gap-2">
-            <Typography variantStyle="label">{CREATE_GROUP_PAGE_COPY.inviteMembersLabel}</Typography>
+            <Typography variantStyle="label">
+              {CREATE_GROUP_PAGE_COPY.inviteMembersLabel}
+            </Typography>
             <div
               ref={selectorRef}
               className="rounded-lg border border-[#7ec5ff] bg-transparent"
@@ -48,11 +52,10 @@ export default function CreateGroupPage() {
                       key={member.id}
                       className="inline-flex items-center gap-2 rounded-lg bg-white/18 p-1.5 text-sm font-medium text-[#eff5ff]"
                     >
-                      <Avatar
-                        user={{ name: member.name, avatarUrl: member.avatarUrl }}
-                        size="sm"
-                      />
-                      <Typography component="span" variantStyle="label">{member.name}</Typography>
+                      <Avatar user={{ name: member.name, avatarUrl: member.avatarUrl }} size="sm" />
+                      <Typography component="span" variantStyle="label">
+                        {member.name}
+                      </Typography>
                     </button>
                   ))}
 
@@ -60,7 +63,9 @@ export default function CreateGroupPage() {
                     type="text"
                     value={query}
                     onChange={(event) => onQueryChange(event.target.value)}
-                    placeholder={selectedMembers.length ? "" : CREATE_GROUP_PAGE_COPY.inviteInputPlaceholder}
+                    placeholder={
+                      selectedMembers.length ? "" : CREATE_GROUP_PAGE_COPY.inviteInputPlaceholder
+                    }
                     className="h-8 min-w-[160px] flex-1 bg-transparent text-sm text-[#eaf2ff] outline-none placeholder:text-[#88a2d2]"
                   />
                 </div>
@@ -83,15 +88,23 @@ export default function CreateGroupPage() {
                             : "border-white/12 bg-white/8 text-[#e3ebf7] hover:bg-white/12",
                         ].join(" ")}
                       >
-                        <Typography component="span" variantStyle="label" className="flex items-center gap-3">
+                        <Typography
+                          component="span"
+                          variantStyle="label"
+                          className="flex items-center gap-3"
+                        >
                           <Avatar
                             user={{ name: member.name, avatarUrl: member.avatarUrl }}
                             size="sm"
                           />
-                          <Typography component="span" variantStyle="body">{member.name}</Typography>
+                          <Typography component="span" variantStyle="body">
+                            {member.name}
+                          </Typography>
                         </Typography>
                         {isSelected ? (
-                          <Typography component="span" variantStyle="caption">{CREATE_GROUP_PAGE_COPY.selectedBadge}</Typography>
+                          <Typography component="span" variantStyle="caption">
+                            {CREATE_GROUP_PAGE_COPY.selectedBadge}
+                          </Typography>
                         ) : null}
                       </button>
                     );

@@ -10,14 +10,8 @@ export function ConversationAvatar({ conversation }: Props) {
     return (
       <div className="flex">
         {conversation.avatarUrls.slice(0, 3).map((avatarUrl, index) => (
-          <div
-            key={avatarUrl}
-            className={index === 0 ? "" : "-ml-3"}
-          >
-            <Avatar
-              user={{ name: conversation.title, avatarUrl }}
-              size="sm"
-            />
+          <div key={avatarUrl} className={index === 0 ? "" : "-ml-3"}>
+            <Avatar user={{ name: conversation.title, avatarUrl }} size="sm" />
           </div>
         ))}
       </div>
@@ -26,7 +20,5 @@ export function ConversationAvatar({ conversation }: Props) {
 
   const avatarUrl = conversation.avatarUrls[0];
 
-  return (
-    <Avatar user={{ name: conversation.title, avatarUrl }} size="sm" />
-  );
+  return <Avatar user={{ name: conversation.title, avatarUrl }} size="sm" />;
 }

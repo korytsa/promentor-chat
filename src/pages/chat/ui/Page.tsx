@@ -1,11 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { Typography } from "@promentorapp/ui-kit";
 import { BiExit } from "react-icons/bi";
-import {
-  CHAT_WINDOW_AVATAR_STACK_URLS,
-  MESSAGES,
-  MessageBubble,
-} from "../../../entities/chat";
+import { CHAT_WINDOW_AVATAR_STACK_URLS, MESSAGES, MessageBubble } from "../../../entities/chat";
 import { ChatCompose } from "../../../features/chat-compose";
 import { Avatar } from "../../../shared/ui/Avatar";
 import { CHAT_PAGE_COPY } from "../model/constants";
@@ -31,10 +27,7 @@ export default function ChatPage() {
           <div className="flex items-center gap-3">
             <div className="flex items-center">
               {CHAT_WINDOW_AVATAR_STACK_URLS.map((src, index) => (
-                <div
-                  key={src}
-                  className={index === 0 ? "" : "-ml-2"}
-                >
+                <div key={src} className={index === 0 ? "" : "-ml-2"}>
                   <Avatar
                     user={{
                       name: CHAT_PAGE_COPY.stackAvatarPlaceholderName,
@@ -44,7 +37,10 @@ export default function ChatPage() {
                   />
                 </div>
               ))}
-              <Typography component="span" className="-ml-2 grid h-8 min-w-8 place-items-center rounded-full border border-blue-400 px-2 font-semibold text-[#e5efff]">
+              <Typography
+                component="span"
+                className="-ml-2 grid h-8 min-w-8 place-items-center rounded-full border border-blue-400 px-2 font-semibold text-[#e5efff]"
+              >
                 {CHAT_PAGE_COPY.overflowCountLabel}
               </Typography>
             </div>
@@ -59,8 +55,8 @@ export default function ChatPage() {
           </div>
 
           <button className="flex cursor-pointer items-center gap-1.5 text-xs text-red-500 transition hover:text-red-400">
-          <BiExit className="text-sm" />
-          Leave Group
+            <BiExit className="text-sm" />
+            Leave Group
           </button>
         </div>
       </header>

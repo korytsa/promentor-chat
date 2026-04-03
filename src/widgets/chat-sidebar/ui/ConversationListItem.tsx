@@ -17,15 +17,16 @@ const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
 
 export function ConversationListItem({ conversation }: Props) {
   return (
-    <NavLink
-      to={`/chat/${conversation.id}`}
-      className={navLinkClassName}
-    >
+    <NavLink to={`/chat/${conversation.id}`} className={navLinkClassName}>
       <div className="flex items-center gap-3">
         <ConversationAvatar conversation={conversation} />
         <div>
-          <Typography component="p" variantStyle="subtitle" className="text-sm!">{conversation.title}</Typography>
-          <Typography component="p" variantStyle="caption" className="text-xs!">{conversation.updatedAt}</Typography>
+          <Typography component="p" variantStyle="subtitle" className="text-sm!">
+            {conversation.title}
+          </Typography>
+          <Typography component="p" variantStyle="caption" className="text-xs!">
+            {conversation.updatedAt}
+          </Typography>
         </div>
       </div>
     </NavLink>

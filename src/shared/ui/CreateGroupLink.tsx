@@ -11,11 +11,10 @@ type CreateGroupLinkProps = {
 const baseClassName =
   "inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-4 py-3 text-sm font-semibold text-[#e7f0ff] transition hover:border-white/30";
 
-const variantClassName: Record<NonNullable<CreateGroupLinkProps["variant"]>, string> =
-  {
-    empty:"w-full hover:bg-white/10 md:w-[280px]",
-    sidebar:"w-full hover:bg-white/10",
-  };
+const variantClassName: Record<NonNullable<CreateGroupLinkProps["variant"]>, string> = {
+  empty: "w-full hover:bg-white/10 md:w-[280px]",
+  sidebar: "w-full hover:bg-white/10",
+};
 
 export function CreateGroupLink({
   className,
@@ -25,15 +24,10 @@ export function CreateGroupLink({
   return (
     <Link
       to="/chat/create-group"
-      className={[
-        baseClassName,
-        variantClassName[variant],
-        className ?? "",
-      ].join(" ")}
+      className={[baseClassName, variantClassName[variant], className ?? ""].join(" ")}
     >
       <MdOutlineGroups className="shrink-0 text-lg" aria-hidden />
       {children}
     </Link>
   );
 }
-

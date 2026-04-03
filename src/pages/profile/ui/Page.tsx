@@ -18,9 +18,14 @@ function ProfileHeader({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <Typography component="h1" variantStyle="title">{pageTitle}</Typography>
+      <Typography component="h1" variantStyle="title">
+        {pageTitle}
+      </Typography>
       <div className="flex items-center gap-2">
-        <Typography variantStyle="label" className="inline-flex shrink-0 items-center rounded-lg border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-xs! font-medium leading-none text-green-300!">
+        <Typography
+          variantStyle="label"
+          className="inline-flex shrink-0 items-center rounded-lg border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-xs! font-medium leading-none text-green-300!"
+        >
           MENTOR
         </Typography>
         {isViewingOwnProfile && (
@@ -41,11 +46,17 @@ function ProfileHeader({
 function ProfileIdentity({ profile }: { profile: UserProfile }) {
   return (
     <div className="mt-6 flex flex-wrap items-center gap-4">
-      <Avatar user={{ name: profile.displayName, avatarUrl: profile.avatarUrl }}size="lg"/>
+      <Avatar user={{ name: profile.displayName, avatarUrl: profile.avatarUrl }} size="lg" />
       <div>
-        <Typography component="p" variantStyle="title">{profile.displayName}</Typography>
-        <Typography component="p" variantStyle="caption">{profile.role}</Typography>
-        <Typography component="p" className="mt-1 text-xs text-green-600!">{profile.statusLabel}</Typography>
+        <Typography component="p" variantStyle="title">
+          {profile.displayName}
+        </Typography>
+        <Typography component="p" variantStyle="caption">
+          {profile.role}
+        </Typography>
+        <Typography component="p" className="mt-1 text-xs text-green-600!">
+          {profile.statusLabel}
+        </Typography>
       </div>
     </div>
   );
@@ -59,12 +70,13 @@ function ProfileActivityStats({
   return (
     <div className="mt-6 grid gap-3 sm:grid-cols-3">
       {rows.map(({ label, value }) => (
-        <div
-          key={label}
-          className="rounded-lg border border-white/20 bg-white/2 p-3"
-        >
-          <Typography component="p" variantStyle="label">{label}</Typography>
-          <Typography component="p" variantStyle="caption">{value}</Typography>
+        <div key={label} className="rounded-lg border border-white/20 bg-white/2 p-3">
+          <Typography component="p" variantStyle="label">
+            {label}
+          </Typography>
+          <Typography component="p" variantStyle="caption">
+            {value}
+          </Typography>
         </div>
       ))}
     </div>
@@ -74,12 +86,18 @@ function ProfileActivityStats({
 function ProfilePreferences() {
   return (
     <article className={PROFILE_PAGE_STYLES.panel}>
-      <Typography component="h2" className={PROFILE_PAGE_STYLES.sectionTitle}>Preferences</Typography>
+      <Typography component="h2" className={PROFILE_PAGE_STYLES.sectionTitle}>
+        Preferences
+      </Typography>
       <div className="mt-4 space-y-3">
         {PROFILE_PREFERENCE_ITEMS.map(({ label, description }) => (
           <div key={label} className={PROFILE_PAGE_STYLES.preferenceRow}>
-            <Typography component="p" variantStyle="label">{label}</Typography>
-            <Typography component="p" variantStyle="caption">{description}</Typography>
+            <Typography component="p" variantStyle="label">
+              {label}
+            </Typography>
+            <Typography component="p" variantStyle="caption">
+              {description}
+            </Typography>
           </div>
         ))}
       </div>
@@ -87,15 +105,13 @@ function ProfilePreferences() {
   );
 }
 
-function ProfileContact({
-  onSendMessage,
-}: {
-  onSendMessage: () => void;
-}) {
+function ProfileContact({ onSendMessage }: { onSendMessage: () => void }) {
   return (
     <article className="flex flex-col justify-between">
       <div className={`${PROFILE_PAGE_STYLES.panel} h-full`}>
-        <Typography component="h2" className={PROFILE_PAGE_STYLES.sectionTitle}>Contact</Typography>
+        <Typography component="h2" className={PROFILE_PAGE_STYLES.sectionTitle}>
+          Contact
+        </Typography>
         <Typography component="p" variantStyle="caption">
           Message this mentor from the chat or mention them in a group.
         </Typography>
@@ -114,8 +130,12 @@ function ProfileContact({
 function ProfileAbout({ about }: { about: string }) {
   return (
     <article className={`mt-4 ${PROFILE_PAGE_STYLES.panel}`}>
-      <Typography component="h2" className={PROFILE_PAGE_STYLES.sectionTitle}>About</Typography>
-      <Typography component="p" variantStyle="caption">{about}</Typography>
+      <Typography component="h2" className={PROFILE_PAGE_STYLES.sectionTitle}>
+        About
+      </Typography>
+      <Typography component="p" variantStyle="caption">
+        {about}
+      </Typography>
     </article>
   );
 }
@@ -150,7 +170,11 @@ export default function ProfilePage() {
           {isViewingOwnProfile && <ProfileActivityStats rows={chatActivityStatRows} />}
         </article>
 
-        {isViewingOwnProfile ? <ProfilePreferences /> : <ProfileContact onSendMessage={onSendMessage} />}
+        {isViewingOwnProfile ? (
+          <ProfilePreferences />
+        ) : (
+          <ProfileContact onSendMessage={onSendMessage} />
+        )}
       </div>
 
       <ProfileAbout about={resolvedProfile.about} />

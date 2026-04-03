@@ -25,9 +25,7 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
     member.name.toLowerCase().includes(query.trim().toLowerCase()),
   );
 
-  const selectedMembers = SEARCH_USERS.filter((member) =>
-    selectedMemberIds.includes(member.id),
-  );
+  const selectedMembers = SEARCH_USERS.filter((member) => selectedMemberIds.includes(member.id));
 
   const closeSelectorIfEmpty = (memberIds: string[]) => {
     if (memberIds.length === 0) {

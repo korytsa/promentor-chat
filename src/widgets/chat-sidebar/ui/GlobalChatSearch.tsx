@@ -60,15 +60,16 @@ export function GlobalChatSearch({
                 }}
                 className="mb-2 flex w-full cursor-pointer items-center gap-3 rounded-lg border border-white/12 bg-white/8 px-2 py-1 text-left transition last:mb-0 hover:bg-white/12"
               >
-                <Avatar
-                  user={{ name: user.name, avatarUrl: user.avatarUrl }}
-                  size="sm"
-                />
-                <Typography component="span" className="text-sm!">{user.name}</Typography>
+                <Avatar user={{ name: user.name, avatarUrl: user.avatarUrl }} size="sm" />
+                <Typography component="span" className="text-sm!">
+                  {user.name}
+                </Typography>
               </button>
             ))
           ) : (
-            <Typography component="p" variantStyle="caption">No users found</Typography>
+            <Typography component="p" variantStyle="caption">
+              No users found
+            </Typography>
           )}
         </div>
       ) : null}

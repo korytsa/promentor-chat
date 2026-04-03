@@ -1,11 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { CONVERSATIONS } from "../../../entities/chat";
 import type { UserProfile } from "../../../entities/profile";
-import {
-  CURRENT_USER_SLUG,
-  profileHeadingTitle,
-  resolveProfile,
-} from "../../../entities/profile";
+import { CURRENT_USER_SLUG, profileHeadingTitle, resolveProfile } from "../../../entities/profile";
 import { PROFILE_PAGE_ROUTES } from "./constants";
 
 export type ProfilePageRedirect = {
@@ -56,8 +52,7 @@ export function useProfilePage(): ProfilePageState {
   const isViewingOwnProfile = !profileSlug;
   const directConversationWithParticipant = CONVERSATIONS.find(
     (conversation) =>
-      conversation.category === "direct" &&
-      conversation.title === resolvedProfile.displayName,
+      conversation.category === "direct" && conversation.title === resolvedProfile.displayName,
   );
   const firstDirectConversation = CONVERSATIONS.find(
     (conversation) => conversation.category === "direct",

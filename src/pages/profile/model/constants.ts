@@ -5,8 +5,7 @@ export const PROFILE_PAGE_ROUTES = {
 
 export const PROFILE_PAGE_STYLES = {
   panel: "rounded-lg border border-white/20 bg-white/3 p-5",
-  sectionTitle:
-    "text-sm font-semibold uppercase tracking-[0.08em] !text-[#9bb4df]",
+  sectionTitle: "text-sm font-semibold uppercase tracking-[0.08em] !text-[#9bb4df]",
   preferenceRow: "rounded-lg border border-white/20 bg-white/2 px-4 py-3",
 } as const;
 

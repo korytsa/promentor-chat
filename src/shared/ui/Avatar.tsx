@@ -35,20 +35,10 @@ function AvatarContent({ user, size }: Pick<AvatarProps, "user" | "size">) {
     return <span className={commonClassName}>{getInitial(user.name)}</span>;
   }
 
-  return (
-    <img
-      src={user.avatarUrl}
-      alt={user.name}
-      className={`${commonClassName} object-cover`}
-    />
-  );
+  return <img src={user.avatarUrl} alt={user.name} className={`${commonClassName} object-cover`} />;
 }
 
-export function Avatar({
-  user,
-  size,
-  href,
-}: AvatarProps) {
+export function Avatar({ user, size, href }: AvatarProps) {
   if (href) {
     return (
       <Link

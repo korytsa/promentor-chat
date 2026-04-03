@@ -7,9 +7,7 @@ export function useConversationSearch() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const q = query.trim().toLowerCase();
-  const filteredUsers = SEARCH_USERS.filter((user) =>
-    user.name.toLowerCase().includes(q),
-  );
+  const filteredUsers = SEARCH_USERS.filter((user) => user.name.toLowerCase().includes(q));
 
   useEffect(() => {
     const onPointerDown = (event: PointerEvent) => {
