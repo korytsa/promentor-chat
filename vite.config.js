@@ -5,8 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, ".", "");
-  const shellRemoteUrl =
-    env.VITE_SHELL_REMOTE_URL || "http://localhost:5173/assets/remoteEntry.js";
+  const shellRemoteUrl = env.VITE_SHELL_REMOTE_URL || "http://localhost:5173/assets/remoteEntry.js";
 
   return {
     plugins: [

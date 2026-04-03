@@ -21,4 +21,3 @@ declare module "shell/authBridge" {
     logout: () => Promise<void>;
   };
 }
-

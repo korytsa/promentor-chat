@@ -74,4 +74,3 @@ export function useHostAuthSession() {
 
   return { session, isBridgeAvailable, isHydrating };
 }
-
