@@ -24,7 +24,7 @@
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.2",
     "@mui/material": "^6.5.0",
-    "@promentorapp/ui-kit": "^0.1.2",
+    "@promentorapp/ui-kit": "0.1.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.72.0",

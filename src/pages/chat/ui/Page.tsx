@@ -1,9 +1,8 @@
 import { Navigate } from "react-router-dom";
-import { Typography } from "@promentorapp/ui-kit";
+import { Typography, Avatar, Button } from "@promentorapp/ui-kit";
 import { BiExit } from "react-icons/bi";
 import { CHAT_WINDOW_AVATAR_STACK_URLS, MESSAGES, MessageBubble } from "../../../entities/chat";
 import { ChatCompose } from "../../../features/chat-compose";
-import { Avatar } from "../../../shared/ui/Avatar";
 import { CHAT_PAGE_COPY } from "../model/constants";
 import { useChatPage } from "../model/useChatPage";
 
@@ -54,10 +53,10 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <button className="flex cursor-pointer items-center gap-1.5 text-xs text-red-500 transition hover:text-red-400">
+          <Button type="button" variant="text" color="error">
             <BiExit className="text-sm" />
             Leave Group
-          </button>
+          </Button>
         </div>
       </header>
 

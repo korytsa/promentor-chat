@@ -1,5 +1,4 @@
-import { Typography } from "@promentorapp/ui-kit";
-import { Avatar } from "../../../shared/ui/Avatar";
+import { Typography, Avatar } from "@promentorapp/ui-kit";
 import type { ChatMessage } from "../model/types";
 
 type MessageBubbleProps = {

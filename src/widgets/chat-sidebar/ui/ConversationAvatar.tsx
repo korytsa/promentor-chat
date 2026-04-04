@@ -1,5 +1,5 @@
 import type { Conversation } from "../../../entities/chat";
-import { Avatar } from "../../../shared/ui/Avatar";
+import { Avatar } from "@promentorapp/ui-kit";
 
 type Props = {
   conversation: Conversation;

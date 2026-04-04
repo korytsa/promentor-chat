@@ -1,17 +1,17 @@
-import { Typography } from "@promentorapp/ui-kit";
+import { Typography, TextField } from "@promentorapp/ui-kit";
 import { FiSearch } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import type { SearchUser } from "../../../entities/chat";
-import { Avatar } from "../../../shared/ui/Avatar";
 import type { RefObject } from "react";
+import { UserListItem } from "../../../shared/ui/UserListItem";
 
 type Props = {
   query: string;
-  setQuery: (value: string) => void;
   isOpen: boolean;
+  filteredUsers: SearchUser[];
+  setQuery: (value: string) => void;
   setIsOpen: (value: boolean) => void;
   containerRef: RefObject<HTMLDivElement | null>;
-  filteredUsers: SearchUser[];
 };
 
 export function GlobalChatSearch({
@@ -29,42 +29,41 @@ export function GlobalChatSearch({
       <label className="sr-only" htmlFor="global-chat-search">
         Search conversations
       </label>
-      <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-[#88a2d2]">
-        <FiSearch size={16} />
+      <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2">
+        <FiSearch className="text-white/50" />
       </span>
-      <input
-        id="global-chat-search"
-        type="search"
-        value={query}
-        onChange={(event) => {
-          setQuery(event.target.value);
-          setIsOpen(true);
-        }}
-        onFocus={() => setIsOpen(true)}
-        placeholder="Search conversation..."
-        className="py-2.5 w-full rounded-lg border border-white/20 pl-10 pr-3 text-sm text-[#eaf2ff] outline-none placeholder:text-[#88a2d2] focus:border-[#2a6de5]"
-        autoComplete="off"
-      />
+      <div className="[&>label]:gap-0 [&>label>p]:sr-only">
+        <TextField
+          id="global-chat-search"
+          label="Search conversations"
+          type="search"
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          placeholder="Search conversation..."
+          autoComplete="off"
+          className="h-11! border-white/20! bg-transparent! py-2.5! pl-10! pr-3! text-sm! focus:border-[#2a6de5]!"
+        />
+      </div>
 
       {isOpen ? (
         <div className="hide-scrollbar absolute left-0 right-0 top-full z-20 mt-1 max-h-[268px] overflow-y-auto rounded-lg border border-white/20 bg-[#0f1f3d] p-2 shadow-[0_12px_40px_rgba(0,0,0,0.45)]">
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user) => (
-              <button
+              <UserListItem
                 key={user.id}
-                type="button"
+                name={user.name}
+                avatarUrl={user.avatarUrl}
                 onClick={() => {
                   navigate(`/chat/${user.chatId}`);
                   setQuery("");
                   setIsOpen(false);
                 }}
-                className="mb-2 flex w-full cursor-pointer items-center gap-3 rounded-lg border border-white/12 bg-white/8 px-2 py-1 text-left transition last:mb-0 hover:bg-white/12"
-              >
-                <Avatar user={{ name: user.name, avatarUrl: user.avatarUrl }} size="sm" />
-                <Typography component="span" className="text-sm!">
-                  {user.name}
-                </Typography>
-              </button>
+                className="mb-2 last:mb-0"
+              />
             ))
           ) : (
             <Typography component="p" variantStyle="caption">

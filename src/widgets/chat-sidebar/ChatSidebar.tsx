@@ -1,9 +1,8 @@
-import { Typography } from "@promentorapp/ui-kit";
+import { Typography, Avatar } from "@promentorapp/ui-kit";
 import { Link } from "react-router-dom";
 import { CONVERSATIONS } from "../../entities/chat";
 import { CURRENT_USER_PROFILE } from "../../entities/profile";
 import { CreateGroupLink } from "../../shared/ui/CreateGroupLink";
-import { Avatar } from "../../shared/ui/Avatar";
 import { useConversationSearch } from "./model/useConversationSearch";
 import { ConversationListItem } from "./ui/ConversationListItem";
 import { GlobalChatSearch } from "./ui/GlobalChatSearch";
@@ -14,7 +13,7 @@ export default function ChatSidebar() {
 
   const search = useConversationSearch();
 
-  const categoryClassName = "mb-1! text-[10px]! font-bold! text-[#9bb4df]!";
+  const categoryClassName = "mb-1! text-[12px]! font-bold! text-white/50!";
 
   return (
     <div className="hidden w-[280px] flex-col gap-5 rounded-l-lg border border-r-0 border-white/20 p-2 lg:flex">

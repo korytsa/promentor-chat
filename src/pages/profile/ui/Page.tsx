@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
-import { Typography } from "@promentorapp/ui-kit";
+import { Typography, Avatar, Button } from "@promentorapp/ui-kit";
 import { RiEdit2Line } from "react-icons/ri";
-import { Avatar } from "../../../shared/ui/Avatar";
 import type { UserProfile } from "../../../entities/profile";
 import { PROFILE_PAGE_STYLES, PROFILE_PREFERENCE_ITEMS } from "../model/constants";
 import type { ProfilePageReadyViewModel } from "../model/useProfilePage";
@@ -24,19 +23,15 @@ function ProfileHeader({
       <div className="flex items-center gap-2">
         <Typography
           variantStyle="label"
-          className="inline-flex shrink-0 items-center rounded-lg border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-xs! font-medium leading-none text-green-300!"
+          className="rounded-lg! border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-green-300!"
         >
-          MENTOR
+          Mentor
         </Typography>
         {isViewingOwnProfile && (
-          <button
-            type="button"
-            onClick={onEditProfile}
-            className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-[#4f80d6]/60 bg-[#1a2f5a]/70 px-3 py-1 text-xs font-medium leading-none text-[#d6e6ff]! transition hover:bg-[#21407d]"
-          >
+          <Button type="button" onClick={onEditProfile} variant="outlined">
             <RiEdit2Line className="text-sm" />
             Edit Profile
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -54,7 +49,7 @@ function ProfileIdentity({ profile }: { profile: UserProfile }) {
         <Typography component="p" variantStyle="caption">
           {profile.role}
         </Typography>
-        <Typography component="p" className="mt-1 text-xs text-green-600!">
+        <Typography component="p" className="text-xs! text-green-600!">
           {profile.statusLabel}
         </Typography>
       </div>
@@ -116,13 +111,15 @@ function ProfileContact({ onSendMessage }: { onSendMessage: () => void }) {
           Message this mentor from the chat or mention them in a group.
         </Typography>
       </div>
-      <button
+      <Button
         type="button"
-        className="mt-4 w-full rounded-lg border border-[#2a6de5] bg-[#1a3f85] px-4 py-2 text-sm font-semibold text-[#e7f0ff]! shadow-[0_8px_20px_rgba(13,47,109,0.35)] transition hover:bg-[#2456b2]"
+        className="mt-4"
+        variant="contained"
+        fullWidth
         onClick={onSendMessage}
       >
         Send Message
-      </button>
+      </Button>
     </article>
   );
 }
