@@ -115,13 +115,7 @@ function ProfileContact({ onSendMessage }: { onSendMessage: () => void }) {
           Message this mentor from the chat or mention them in a group.
         </Typography>
       </div>
-      <Button
-        type="button"
-        className="mt-4"
-        variant="contained"
-        fullWidth
-        onClick={onSendMessage}
-      >
+      <Button type="button" className="mt-4" variant="contained" fullWidth onClick={onSendMessage}>
         Send Message
       </Button>
     </article>

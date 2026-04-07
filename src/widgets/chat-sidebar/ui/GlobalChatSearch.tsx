@@ -71,7 +71,9 @@ export function GlobalChatSearch({
           aria-autocomplete="list"
           aria-expanded={isOpen}
           aria-controls={listboxId}
-          aria-activedescendant={activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined}
+          aria-activedescendant={
+            activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
+          }
           type="search"
           value={query}
           onChange={(event) => {
@@ -110,9 +112,7 @@ export function GlobalChatSearch({
 
             if (event.key === "ArrowUp") {
               event.preventDefault();
-              setActiveIndex((current) =>
-                current <= 0 ? filteredUsers.length - 1 : current - 1,
-              );
+              setActiveIndex((current) => (current <= 0 ? filteredUsers.length - 1 : current - 1));
               return;
             }
 

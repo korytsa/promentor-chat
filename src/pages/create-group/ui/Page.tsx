@@ -141,7 +141,9 @@ export default function CreateGroupPage() {
             {CREATE_GROUP_PAGE_COPY.title}
           </Typography>
         </div>
-        <Typography variantStyle="caption" className="text-sm!">{CREATE_GROUP_PAGE_COPY.subtitle}</Typography>
+        <Typography variantStyle="caption" className="text-sm!">
+          {CREATE_GROUP_PAGE_COPY.subtitle}
+        </Typography>
 
         <div className="mt-4 grid gap-4">
           <TextField

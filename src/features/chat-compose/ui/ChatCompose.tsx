@@ -2,7 +2,8 @@ import { IoIosImages, IoIosPaperPlane } from "react-icons/io";
 import { MdEmojiEmotions } from "react-icons/md";
 import { Button, TextField } from "@promentorapp/ui-kit";
 
-const iconButtonClassName = "h-8! min-h-8! w-8! min-w-8! p-0! sm:h-10! sm:min-h-10! sm:w-10! sm:min-w-10! p-0!";
+const iconButtonClassName =
+  "h-8! min-h-8! w-8! min-w-8! p-0! sm:h-10! sm:min-h-10! sm:w-10! sm:min-w-10! p-0!";
 const iconClassName = "size-5 text-[#e7f0ff]";
 
 export function ChatCompose() {

@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { Typography, Avatar, Button } from "@promentorapp/ui-kit";
-import {  BiExit } from "react-icons/bi";
+import { BiExit } from "react-icons/bi";
 import { CHAT_WINDOW_AVATAR_STACK_URLS, MESSAGES, MessageBubble } from "../../../entities/chat";
 import { ChatCompose } from "../../../features/chat-compose";
 import { MobileBackLink } from "../../../shared/ui/MobileBackLink";

@@ -16,7 +16,9 @@ export function MobileBackLink({
     <Link
       to={to}
       aria-label={ariaLabel}
-      className={["inline-flex items-center justify-center md:hidden", className ?? ""].join(" ").trim()}
+      className={["inline-flex items-center justify-center md:hidden", className ?? ""]
+        .join(" ")
+        .trim()}
     >
       <IoIosArrowBack className="text-xl" />
     </Link>
