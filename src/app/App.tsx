@@ -1,18 +1,25 @@
-import "./index.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ChatPage from "../pages/chat";
-import AuthSessionBoundary from "./AuthSessionBoundary";
+import CreateGroupPage from "../pages/create-group";
+import ProfilePage from "../pages/profile";
+import { AppBackground } from "../shared/ui/AppBackground";
+import ChatEmptyPage from "../pages/empty-chat/ui/Page";
+import { ChatSidebar } from "../widgets";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-slate-900 pt-10">
-        <AuthSessionBoundary>
-          <Routes>
-            <Route path="/" element={<ChatPage />} />
-          </Routes>
-        </AuthSessionBoundary>
-      </div>
-    </BrowserRouter>
+    <AppBackground contentClassName="md:px-6 md:py-6">
+      <main className="mx-auto flex min-h-0 flex-1 w-full max-w-7xl gap-2 flex-row">
+        <ChatSidebar />
+        <Routes>
+          <Route path="/" element={<ChatEmptyPage />} />
+          <Route path="/chat/:chatId" element={<ChatPage />} />
+          <Route path="/chat/create-group" element={<CreateGroupPage />} />
+          <Route path="/chat/profile" element={<ProfilePage />} />
+          <Route path="/chat/profile/:slug" element={<ProfilePage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </AppBackground>
   );
 }
