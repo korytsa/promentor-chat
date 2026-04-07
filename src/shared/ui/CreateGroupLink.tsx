@@ -6,6 +6,7 @@ type CreateGroupLinkProps = {
   className?: string;
   children?: ReactNode;
   variant?: "empty" | "sidebar";
+  onClick?: () => void;
 };
 
 const baseClassName =
@@ -20,10 +21,12 @@ export function CreateGroupLink({
   className,
   children = "Create Group",
   variant = "sidebar",
+  onClick,
 }: CreateGroupLinkProps) {
   return (
     <Link
       to="/chat/create-group"
+      onClick={onClick}
       className={[baseClassName, variantClassName[variant], className ?? ""].join(" ")}
     >
       <MdOutlineGroups className="shrink-0 text-lg" aria-hidden />

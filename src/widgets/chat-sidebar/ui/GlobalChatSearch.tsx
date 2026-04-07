@@ -25,7 +25,7 @@ export function GlobalChatSearch({
   const navigate = useNavigate();
 
   return (
-    <section ref={containerRef} className="relative w-full max-w-xs">
+    <section ref={containerRef} className="relative w-full sm:max-w-xs">
       <label className="sr-only" htmlFor="global-chat-search">
         Search conversations
       </label>

@@ -2,25 +2,28 @@ import { IoIosImages, IoIosPaperPlane } from "react-icons/io";
 import { MdEmojiEmotions } from "react-icons/md";
 import { Button, TextField } from "@promentorapp/ui-kit";
 
+const iconButtonClassName = "h-8! min-h-8! w-8! min-w-8! p-0! sm:h-10! sm:min-h-10! sm:w-10! sm:min-w-10! p-0!";
+const iconClassName = "size-5 text-[#e7f0ff]";
+
 export function ChatCompose() {
   return (
-    <form className="border-t border-white/20 p-4">
+    <form className="border-t border-white/20 p-2 sm:p-4">
       <div className="flex items-center gap-3 rounded-lg ">
         <Button
           type="button"
           aria-label="Attach image"
-          isIconOnly
           variant="contained"
+          className={iconButtonClassName}
         >
-          <IoIosImages className="h-5 w-5" />
+          <IoIosImages className={iconClassName} />
         </Button>
         <Button
           type="button"
           aria-label="Attach emoji"
-          isIconOnly
           variant="contained"
+          className={iconButtonClassName}
         >
-          <MdEmojiEmotions className="h-5 w-5" />
+          <MdEmojiEmotions className={iconClassName} />
         </Button>
 
         <div className="flex-1 [&>label]:gap-0 [&>label>p]:sr-only">
@@ -29,16 +32,16 @@ export function ChatCompose() {
             type="text"
             size="sm"
             placeholder="Type your message..."
-            className="border-none! bg-transparent! outline-none! focus:ring-0!"
+            className="border-none! pl-0! sm:pl-1! bg-transparent! outline-none! focus:ring-0!"
           />
         </div>
         <Button
           type="button"
           aria-label="Send message"
-          isIconOnly
           variant="contained"
+          className={iconButtonClassName}
         >
-          <IoIosPaperPlane className="h-5 w-5" />
+          <IoIosPaperPlane className={iconClassName} />
         </Button>
       </div>
     </form>

@@ -8,8 +8,8 @@ import { ChatSidebar } from "../widgets";
 
 export default function App() {
   return (
-    <AppBackground contentClassName="px-3 py-4 md:px-6 md:py-6">
-      <main className="mx-auto flex min-h-0 flex-1 w-full max-w-7xl flex-row">
+    <AppBackground contentClassName="md:px-6 md:py-6">
+      <main className="mx-auto flex min-h-0 flex-1 w-full max-w-7xl gap-2 flex-row">
         <ChatSidebar />
         <Routes>
           <Route path="/" element={<ChatEmptyPage />} />

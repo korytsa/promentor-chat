@@ -5,6 +5,7 @@ import { ConversationAvatar } from "./ConversationAvatar";
 
 type Props = {
   conversation: Conversation;
+  onClick?: () => void;
 };
 
 const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
@@ -15,9 +16,9 @@ const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
       : "border-white/20 hover:border-white/30 hover:bg-white/10",
   ].join(" ");
 
-export function ConversationListItem({ conversation }: Props) {
+export function ConversationListItem({ conversation, onClick }: Props) {
   return (
-    <NavLink to={`/chat/${conversation.id}`} className={navLinkClassName}>
+    <NavLink to={`/chat/${conversation.id}`} className={navLinkClassName} onClick={onClick}>
       <div className="flex items-center gap-3">
         <ConversationAvatar conversation={conversation} />
         <div>

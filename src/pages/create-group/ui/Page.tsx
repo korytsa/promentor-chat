@@ -1,5 +1,6 @@
 import { Typography, Avatar, Button, TextField } from "@promentorapp/ui-kit";
 import { UserListItem } from "../../../shared/ui/UserListItem";
+import { MobileBackLink } from "../../../shared/ui/MobileBackLink";
 import { CREATE_GROUP_PAGE_COPY } from "../model/constants";
 import { useCreateGroupPage } from "../model/useCreateGroupPage";
 import { Link } from "react-router-dom";
@@ -111,12 +112,15 @@ export default function CreateGroupPage() {
   const state = useCreateGroupPage();
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col rounded-r-lg border border-white/20 p-4">
-      <div className="rounded-lg border border-white/20 bg-white/3 p-4">
-        <Typography variant="h5" variantStyle="title">
-          {CREATE_GROUP_PAGE_COPY.title}
-        </Typography>
-        <Typography variantStyle="caption">{CREATE_GROUP_PAGE_COPY.subtitle}</Typography>
+    <section className="flex min-h-0 flex-1 flex-col rounded-lg sm:border border-white/20 sm:p-4">
+      <div className="rounded-lg sm:border border-white/20 sm:bg-white/3 p-4">
+        <div className="flex items-center gap-2 mb-1">
+          <MobileBackLink />
+          <Typography component="h1" variantStyle="title">
+            {CREATE_GROUP_PAGE_COPY.title}
+          </Typography>
+        </div>
+        <Typography variantStyle="caption" className="text-sm!">{CREATE_GROUP_PAGE_COPY.subtitle}</Typography>
 
         <div className="mt-4 grid gap-4">
           <TextField

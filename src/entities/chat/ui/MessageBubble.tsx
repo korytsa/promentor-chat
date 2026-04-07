@@ -24,8 +24,8 @@ export function MessageBubble({ message, resolveProfilePath }: MessageBubbleProp
         </div>
 
         <div className="flex items-start justify-end">
-          <div className="rounded-lg border border-blue-500 px-4 py-3 text-sm leading-relaxed text-[#eef5ff] shadow-[0_6px_18px_rgba(10,45,108,0.38)]">
-            <Typography component="p" variantStyle="caption">
+          <div className="rounded-lg border border-blue-500 px-4 py-3 shadow-[0_6px_18px_rgba(10,45,108,0.38)]">
+            <Typography component="p" variantStyle="caption" className="text-sm! sm:text-base!">
               {message.text}
             </Typography>
           </div>
@@ -58,8 +58,8 @@ export function MessageBubble({ message, resolveProfilePath }: MessageBubbleProp
           </Typography>
         </div>
 
-        <div className="rounded-lg border border-white/20 p-3 text-sm text-[#e8f1ff] shadow-[inset_0_0_0_1px_rgba(147,193,255,0.1)]">
-          <Typography component="p" variantStyle="caption">
+        <div className="rounded-lg border border-white/20 p-3 shadow-[inset_0_0_0_1px_rgba(147,193,255,0.1)]">
+          <Typography component="p" variantStyle="caption" className="text-sm! sm:text-base!">
             {message.text}
           </Typography>
         </div>

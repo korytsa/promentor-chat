@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import { Typography, Avatar, Button } from "@promentorapp/ui-kit";
 import { RiEdit2Line } from "react-icons/ri";
 import type { UserProfile } from "../../../entities/profile";
+import { MobileBackLink } from "../../../shared/ui/MobileBackLink";
 import { PROFILE_PAGE_STYLES, PROFILE_PREFERENCE_ITEMS } from "../model/constants";
 import type { ProfilePageReadyViewModel } from "../model/useProfilePage";
 import { useProfilePage } from "../model/useProfilePage";
@@ -17,9 +18,12 @@ function ProfileHeader({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <Typography component="h1" variantStyle="title">
-        {pageTitle}
-      </Typography>
+      <div className="flex items-center gap-4">
+        <MobileBackLink />
+        <Typography component="h1" variantStyle="title">
+          {pageTitle}
+        </Typography>
+      </div>
       <div className="flex items-center gap-2">
         <Typography
           variantStyle="label"
@@ -130,7 +134,7 @@ function ProfileAbout({ about }: { about: string }) {
       <Typography component="h2" className={PROFILE_PAGE_STYLES.sectionTitle}>
         About
       </Typography>
-      <Typography component="p" variantStyle="caption">
+      <Typography component="p" variantStyle="caption" className="text-sm! sm:text-base!">
         {about}
       </Typography>
     </article>
@@ -155,7 +159,7 @@ export default function ProfilePage() {
   } = state.viewModel;
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col rounded-r-lg border border-white/20 p-6">
+    <section className="flex min-h-0 flex-1 flex-col rounded-lg sm:border border-white/20 p-4">
       <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
         <article className={PROFILE_PAGE_STYLES.panel}>
           <ProfileHeader
