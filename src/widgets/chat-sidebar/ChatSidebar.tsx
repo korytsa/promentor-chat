@@ -1,9 +1,8 @@
 import { Typography, Avatar } from "@promentorapp/ui-kit";
-import { Link, useLocation } from "react-router-dom";
-import { CONVERSATIONS } from "../../entities/chat";
+import { Link } from "react-router-dom";
 import { CURRENT_USER_PROFILE } from "../../entities/profile";
 import { CreateGroupLink } from "../../shared/ui/CreateGroupLink";
-import { useConversationSearch } from "./model/useConversationSearch";
+import { useChatSidebarModel } from "./model/useChatSidebarModel";
 import { ConversationListItem } from "./ui/ConversationListItem";
 import { GlobalChatSearch } from "./ui/GlobalChatSearch";
 
@@ -12,15 +11,8 @@ type ChatSidebarProps = {
 };
 
 export default function ChatSidebar({ className }: ChatSidebarProps) {
-  const location = useLocation();
-  const directMessages = CONVERSATIONS.filter((conversation) => conversation.category === "direct");
-  const groupMessages = CONVERSATIONS.filter((conversation) => conversation.category === "group");
-
-  const search = useConversationSearch();
-
-  const categoryClassName = "mb-1! text-[12px]! font-bold! text-white/50!";
-  const isListRoute = location.pathname === "/";
-  const visibilityClassName = isListRoute ? "flex md:flex" : "hidden md:flex";
+  const { search, directMessages, groupMessages, categoryClassName, visibilityClassName } =
+    useChatSidebarModel();
 
   return (
     <div
