@@ -29,6 +29,8 @@ export function ChatCompose() {
         <div className="flex-1 [&>label]:gap-0 [&>label>p]:sr-only">
           <TextField
             label="Message"
+            aria-label="Message"
+            name="message"
             type="text"
             size="sm"
             placeholder="Type your message..."

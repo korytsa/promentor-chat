@@ -13,6 +13,7 @@ export type CreateGroupPageViewModel = {
   toggleMember: (memberId: string) => void;
   removeMember: (memberId: string) => void;
   onSelectorAreaClick: () => void;
+  onInviteInputFocus: () => void;
 };
 
 export function useCreateGroupPage(): CreateGroupPageViewModel {
@@ -63,6 +64,10 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
     setIsDropdownOpen(true);
   };
 
+  const onInviteInputFocus = () => {
+    setIsDropdownOpen(true);
+  };
+
   useEffect(() => {
     const onDocumentMouseDown = (event: MouseEvent) => {
       if (!selectorRef.current) {
@@ -89,5 +94,6 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
     toggleMember,
     removeMember,
     onSelectorAreaClick,
+    onInviteInputFocus,
   };
 }

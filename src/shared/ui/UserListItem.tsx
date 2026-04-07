@@ -7,6 +7,11 @@ type UserListItemProps = {
   isSelected?: boolean;
   selectedLabel?: string;
   className?: string;
+  id?: string;
+  role?: "option";
+  ariaSelected?: boolean;
+  tabIndex?: number;
+  onMouseEnter?: () => void;
 };
 
 const getUserListItemSx = (isSelected: boolean) => ({
@@ -33,9 +38,24 @@ export function UserListItem({
   isSelected = false,
   selectedLabel,
   className,
+  id,
+  role,
+  ariaSelected,
+  tabIndex,
+  onMouseEnter,
 }: UserListItemProps) {
   return (
-    <Button type="button" onClick={onClick} className={className} sx={getUserListItemSx(isSelected)}>
+    <Button
+      id={id}
+      type="button"
+      role={role}
+      aria-selected={ariaSelected}
+      tabIndex={tabIndex}
+      onMouseEnter={onMouseEnter}
+      onClick={onClick}
+      className={className}
+      sx={getUserListItemSx(isSelected)}
+    >
       <span className="flex items-center gap-3">
         <Avatar user={{ name, avatarUrl }} size="sm" />
         <Typography component="span" variantStyle="body">

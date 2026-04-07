@@ -1,4 +1,5 @@
 import { Typography, Avatar, Button, TextField } from "@promentorapp/ui-kit";
+import type { MouseEvent } from "react";
 import { UserListItem } from "../../../shared/ui/UserListItem";
 import { MobileBackLink } from "../../../shared/ui/MobileBackLink";
 import { CREATE_GROUP_PAGE_COPY } from "../model/constants";
@@ -19,8 +20,13 @@ function SelectedMemberChip({
   member: Member;
   onRemove: (memberId: string) => void;
 }) {
+  const handleRemoveClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onRemove(member.id);
+  };
+
   return (
-    <Button type="button" variant="outlined" onClick={() => onRemove(member.id)}>
+    <Button type="button" variant="outlined" onClick={handleRemoveClick}>
       <Avatar user={{ name: member.name, avatarUrl: member.avatarUrl }} size="sm" />
       <Typography component="span" variantStyle="label">
         {member.name}
@@ -41,6 +47,7 @@ function MembersSelector({ state }: MembersSelectorProps) {
     toggleMember,
     removeMember,
     onSelectorAreaClick,
+    onInviteInputFocus,
   } = state;
 
   const invitePlaceholder = selectedMembers.length
@@ -49,9 +56,13 @@ function MembersSelector({ state }: MembersSelectorProps) {
 
   return (
     <div className="grid gap-2">
-      <Typography variantStyle="label">{CREATE_GROUP_PAGE_COPY.inviteMembersLabel}</Typography>
+      <Typography id="invite-members-label" variantStyle="label">
+        {CREATE_GROUP_PAGE_COPY.inviteMembersLabel}
+      </Typography>
       <div
         ref={selectorRef}
+        role="group"
+        aria-labelledby="invite-members-label"
         className="rounded-lg border border-white/20"
         onClick={onSelectorAreaClick}
       >
@@ -64,19 +75,29 @@ function MembersSelector({ state }: MembersSelectorProps) {
             <div className="min-w-[160px] flex-1 [&>label]:gap-0 [&>label>p]:sr-only">
               <TextField
                 label="Invite members"
+                aria-label={CREATE_GROUP_PAGE_COPY.inviteMembersLabel}
                 type="text"
                 value={query}
                 onChange={(event) => onQueryChange(event.target.value)}
+                onFocus={onInviteInputFocus}
                 placeholder={invitePlaceholder}
                 size="sm"
                 className="h-8! border-0! bg-transparent! px-0! outline-none! ring-0!"
+                aria-expanded={isDropdownOpen}
+                aria-controls={isDropdownOpen ? "create-group-members-listbox" : undefined}
+                aria-autocomplete="list"
               />
             </div>
           </div>
         </div>
 
         {isDropdownOpen ? (
-          <div className="hide-scrollbar max-h-[268px] overflow-y-auto border-t border-white/15 bg-transparent p-2">
+          <div
+            role="listbox"
+            id="create-group-members-listbox"
+            aria-labelledby="invite-members-label"
+            className="hide-scrollbar max-h-[268px] overflow-y-auto border-t border-white/15 bg-transparent p-2"
+          >
             {filteredMembers.map((member) => (
               <UserListItem
                 key={member.id}
@@ -101,7 +122,7 @@ function ActionButtons() {
       <Button type="button" variant="contained" className="rounded-lg!">
         {CREATE_GROUP_PAGE_COPY.createButton}
       </Button>
-      <Link to="/chat" className="rounded-lg border border-white/20 px-4 py-1 hover:border-white/40">
+      <Link to="/" className="rounded-lg border border-white/20 px-4 py-1 hover:border-white/40">
         {CREATE_GROUP_PAGE_COPY.cancelButton}
       </Link>
     </div>
@@ -113,7 +134,7 @@ export default function CreateGroupPage() {
 
   return (
     <section className="flex min-h-0 flex-1 flex-col rounded-lg sm:border border-white/20 sm:p-4">
-      <div className="rounded-lg sm:border border-white/20 sm:bg-white/3 p-4">
+      <div className="rounded-lg sm:border border-white/20 p-4">
         <div className="flex items-center gap-2 mb-1">
           <MobileBackLink />
           <Typography component="h1" variantStyle="title">
@@ -125,6 +146,8 @@ export default function CreateGroupPage() {
         <div className="mt-4 grid gap-4">
           <TextField
             label={CREATE_GROUP_PAGE_COPY.groupNameLabel}
+            aria-label={CREATE_GROUP_PAGE_COPY.groupNameLabel}
+            name="groupName"
             placeholder={CREATE_GROUP_PAGE_COPY.groupNamePlaceholder}
             size="sm"
             className="border-white/20! bg-transparent! focus:border-[#2a6de5]!"

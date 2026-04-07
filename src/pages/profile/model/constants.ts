@@ -1,6 +1,6 @@
 export const PROFILE_PAGE_ROUTES = {
   ownProfile: "/chat/profile",
-  chatHome: "/chat",
+  chatHome: "/",
 } as const;
 
 export const PROFILE_PAGE_STYLES = {
