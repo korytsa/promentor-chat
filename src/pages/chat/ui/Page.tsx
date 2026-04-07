@@ -46,10 +46,10 @@ export default function ChatPage() {
               </Typography>
             </div>
             <div>
-              <Typography component="h2" variantStyle="subtitle" className="text-sm!">
+              <Typography component="h2" variantStyle="subtitle" className="text-sm">
                 {activeConversation.title}
               </Typography>
-              <Typography component="p" variantStyle="caption" className="text-xs! text-[#1bd695]!">
+              <Typography component="p" variantStyle="caption" className="text-xs text-[#1bd695]">
                 {CHAT_PAGE_COPY.activeNowLabel}
               </Typography>
             </div>

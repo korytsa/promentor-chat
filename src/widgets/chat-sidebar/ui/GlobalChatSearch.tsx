@@ -59,7 +59,7 @@ export function GlobalChatSearch({
           onKeyDown={handleKeyDown}
           placeholder="Search conversation..."
           autoComplete="off"
-          className="h-11! border-white/20! bg-transparent! py-2.5! pl-10! pr-3! text-sm! focus:border-[#2a6de5]!"
+          className="h-11 border-white/20 bg-transparent py-2.5 pl-10 pr-3 text-sm focus:border-[#2a6de5]"
         />
       </div>
 

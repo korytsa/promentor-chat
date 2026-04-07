@@ -35,7 +35,7 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
             <Typography component="p" variantStyle="title">
               {CURRENT_USER_PROFILE.displayName}
             </Typography>
-            <Typography component="p" className="text-xs! text-green-600!">
+            <Typography component="p" className="text-xs text-green-600">
               Online
             </Typography>
           </div>
