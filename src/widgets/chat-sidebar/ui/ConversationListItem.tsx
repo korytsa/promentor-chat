@@ -22,10 +22,10 @@ export function ConversationListItem({ conversation, onClick }: Props) {
       <div className="flex items-center gap-3">
         <ConversationAvatar conversation={conversation} />
         <div>
-          <Typography component="p" variantStyle="subtitle" className="text-sm!">
+          <Typography component="p" variantStyle="subtitle" className="text-sm">
             {conversation.title}
           </Typography>
-          <Typography component="p" variantStyle="caption" className="text-xs!">
+          <Typography component="p" variantStyle="caption" className="text-xs">
             {conversation.updatedAt}
           </Typography>
         </div>

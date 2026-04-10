@@ -82,7 +82,7 @@ function MembersSelector({ state }: MembersSelectorProps) {
                 onFocus={onInviteInputFocus}
                 placeholder={invitePlaceholder}
                 size="sm"
-                className="h-8! border-0! bg-transparent! px-0! outline-none! ring-0!"
+                className="h-8 border-0 bg-transparent px-0 outline-none ring-0"
                 aria-expanded={isDropdownOpen}
                 aria-controls={isDropdownOpen ? "create-group-members-listbox" : undefined}
                 aria-autocomplete="list"
@@ -119,7 +119,7 @@ function MembersSelector({ state }: MembersSelectorProps) {
 function ActionButtons() {
   return (
     <div className="mt-6 flex items-center gap-3">
-      <Button type="button" variant="contained" className="rounded-lg!">
+      <Button type="button" variant="contained" className="rounded-lg">
         {CREATE_GROUP_PAGE_COPY.createButton}
       </Button>
       <Link to="/" className="rounded-lg border border-white/20 px-4 py-1 hover:border-white/40">
@@ -141,7 +141,7 @@ export default function CreateGroupPage() {
             {CREATE_GROUP_PAGE_COPY.title}
           </Typography>
         </div>
-        <Typography variantStyle="caption" className="text-sm!">
+        <Typography variantStyle="caption" className="text-sm">
           {CREATE_GROUP_PAGE_COPY.subtitle}
         </Typography>
 
@@ -152,7 +152,7 @@ export default function CreateGroupPage() {
             name="groupName"
             placeholder={CREATE_GROUP_PAGE_COPY.groupNamePlaceholder}
             size="sm"
-            className="border-white/20! bg-transparent! focus:border-[#2a6de5]!"
+            className="border-white/20 bg-transparent focus:border-[#2a6de5]"
           />
           <MembersSelector state={state} />
         </div>

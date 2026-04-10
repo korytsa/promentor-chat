@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" important;
 @source "../node_modules/@promentorapp/ui-kit/dist";
 
 :root {

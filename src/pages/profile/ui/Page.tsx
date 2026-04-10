@@ -27,7 +27,7 @@ function ProfileHeader({
       <div className="flex items-center gap-2">
         <Typography
           variantStyle="label"
-          className="rounded-lg! border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-green-300!"
+          className="rounded-lg border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-green-300"
         >
           Mentor
         </Typography>
@@ -53,7 +53,7 @@ function ProfileIdentity({ profile }: { profile: UserProfile }) {
         <Typography component="p" variantStyle="caption">
           {profile.role}
         </Typography>
-        <Typography component="p" className="text-xs! text-green-600!">
+        <Typography component="p" className="text-xs text-green-600">
           {profile.statusLabel}
         </Typography>
       </div>
@@ -128,7 +128,7 @@ function ProfileAbout({ about }: { about: string }) {
       <Typography component="h2" className={PROFILE_PAGE_STYLES.sectionTitle}>
         About
       </Typography>
-      <Typography component="p" variantStyle="caption" className="text-sm! sm:text-base!">
+      <Typography component="p" variantStyle="caption" className="text-sm sm:text-base">
         {about}
       </Typography>
     </article>

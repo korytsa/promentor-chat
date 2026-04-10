@@ -14,8 +14,8 @@ export function useChatSidebarModel() {
   const directMessages = CONVERSATIONS.filter((conversation) => conversation.category === "direct");
   const groupMessages = CONVERSATIONS.filter((conversation) => conversation.category === "group");
 
-  const categoryClassName = "mb-1! text-[12px]! font-bold! text-white/50!";
-  const isListRoute = location.pathname === "/";
+  const categoryClassName = "mb-1 text-[12px] font-bold text-white/50";
+  const isListRoute = location.pathname === "/" || location.pathname === "/chat";
   const visibilityClassName = isListRoute ? "flex md:flex" : "hidden md:flex";
 
   useEffect(() => {
