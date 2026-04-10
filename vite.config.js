@@ -17,7 +17,12 @@ export default defineConfig({
         "./ChatProfilePage": "./src/pages/profile/index.ts",
         "./ChatSidebar": "./src/widgets/chat-sidebar/ChatSidebar.tsx",
       },
-      shared: ["react", "react-dom", "react-router-dom"],
+      shared: [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@promentorapp/ui-kit",
+      ],
     }),
   ],
   server: {
