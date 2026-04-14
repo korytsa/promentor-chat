@@ -14,6 +14,5 @@ export type ChatMessage = {
   author: string;
   time: string;
   avatarUrl?: string;
-  authorProfileSlug?: string;
   text: string;
 };

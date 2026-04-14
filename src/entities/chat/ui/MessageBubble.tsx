@@ -3,13 +3,10 @@ import type { ChatMessage } from "../model/types";
 
 type MessageBubbleProps = {
   message: ChatMessage;
-  resolveProfilePath?: (authorProfileSlug: string) => string;
 };
 
-export function MessageBubble({ message, resolveProfilePath }: MessageBubbleProps) {
+export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
-  const slug = message.authorProfileSlug;
-  const profileTo = slug && resolveProfilePath ? resolveProfilePath(slug) : undefined;
 
   if (isUser) {
     return (
@@ -42,11 +39,7 @@ export function MessageBubble({ message, resolveProfilePath }: MessageBubbleProp
 
   return (
     <div className="flex max-w-[min(85%,42rem)] items-start gap-3">
-      <Avatar
-        user={{ name: message.author, avatarUrl: message.avatarUrl }}
-        size="sm"
-        href={profileTo}
-      />
+      <Avatar user={{ name: message.author, avatarUrl: message.avatarUrl }} size="sm" />
 
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-baseline justify-between gap-3">

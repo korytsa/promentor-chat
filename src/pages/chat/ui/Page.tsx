@@ -18,7 +18,7 @@ export default function ChatPage() {
     return <Navigate to={state.to} replace={state.replace} />;
   }
 
-  const { activeConversation, resolveProfilePath } = state.viewModel;
+  const { activeConversation } = state.viewModel;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden sm:rounded-lg sm:border border-white/20">
@@ -64,11 +64,7 @@ export default function ChatPage() {
 
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5">
         {MESSAGES.map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            resolveProfilePath={resolveProfilePath}
-          />
+          <MessageBubble key={message.id} message={message} />
         ))}
       </div>
 

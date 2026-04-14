@@ -1,10 +1,8 @@
 import { useParams } from "react-router-dom";
 import { CONVERSATIONS, type Conversation } from "../../../entities/chat";
-import { CURRENT_USER_SLUG } from "../../../entities/profile";
 
 export type ChatPageReadyViewModel = {
   activeConversation: Conversation;
-  resolveProfilePath: (slug: string) => string;
 };
 
 export type ChatPageState =
@@ -28,8 +26,6 @@ export function useChatPage(): ChatPageState {
     status: "ready",
     viewModel: {
       activeConversation,
-      resolveProfilePath: (slug: string) =>
-        slug === CURRENT_USER_SLUG ? "/chat/profile" : `/chat/profile/${slug}`,
     },
   };
 }
