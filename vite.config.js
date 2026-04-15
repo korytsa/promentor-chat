@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import federation from "@originjs/vite-plugin-federation";
 import tailwindcss from "@tailwindcss/vite";
@@ -9,6 +9,9 @@ export default defineConfig({
     tailwindcss(),
     federation({
       name: "chatApp",
+      remotes: {
+        shell: "http://localhost:5173/assets/remoteEntry.js",
+      },
       filename: "remoteEntry.js",
       exposes: {
         "./ChatEmptyPage": "./src/pages/empty-chat/index.ts",

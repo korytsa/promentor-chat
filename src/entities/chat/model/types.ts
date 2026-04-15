@@ -14,6 +14,17 @@ export type ChatSearchOption = {
 
 export type MessageRole = "assistant" | "user";
 
+export type ChatRoomMessageView = {
+  id: string;
+  createdAt: string;
+  text: string;
+  timeLabel: string;
+  authorName: string;
+  avatarUrl?: string;
+  isOwn: boolean;
+  pending?: boolean;
+};
+
 export type ChatMessage = {
   id: string;
   role: MessageRole;

@@ -1,19 +1,30 @@
 import { Typography, Avatar, Button } from "@promentorapp/ui-kit";
 import { BiExit } from "react-icons/bi";
-import { CHAT_WINDOW_AVATAR_STACK_URLS, MESSAGES, MessageBubble } from "../../../entities/chat";
+import { useParams } from "react-router-dom";
+import { MessageBubble } from "../../../entities/chat";
 import { ChatCompose } from "../../../features/chat-compose";
 import { MobileBackLink } from "../../../shared/ui/MobileBackLink";
 import { CHAT_PAGE_COPY } from "../model/constants";
 import { useChatPage } from "../model/useChatPage";
+import { useChatRoomMessages } from "../model/useChatRoomMessages";
 
 export default function ChatPage() {
-  const state = useChatPage();
+  const { chatId } = useParams();
+  const pageState = useChatPage();
+  const {
+    items: messages,
+    isLoading: messagesLoading,
+    errorMessage: messagesError,
+    send,
+    isSending,
+    sendError,
+  } = useChatRoomMessages(chatId);
 
-  if (state.status === "empty") {
+  if (pageState.status === "empty") {
     return null;
   }
 
-  if (state.status === "loading") {
+  if (pageState.status === "loading") {
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center sm:rounded-lg sm:border border-white/20 px-4 py-12">
         <Typography component="p" variantStyle="body">
@@ -23,20 +34,25 @@ export default function ChatPage() {
     );
   }
 
-  if (state.status === "error") {
+  if (pageState.status === "error") {
     return (
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 sm:rounded-lg sm:border border-white/20 px-4 py-12">
         <Typography component="p" variantStyle="subtitle">
           Something went wrong
         </Typography>
         <Typography component="p" variantStyle="caption" className="text-center text-white/70">
-          {state.message}
+          {pageState.message}
         </Typography>
       </div>
     );
   }
 
-  const { activeConversation } = state.viewModel;
+  const { activeConversation } = pageState.viewModel;
+  const headerAvatars = activeConversation.avatarUrls.slice(0, 3);
+  const overflowCount =
+    activeConversation.avatarUrls.length > 3
+      ? activeConversation.avatarUrls.length - 3
+      : 0;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden sm:rounded-lg sm:border border-white/20">
@@ -45,23 +61,32 @@ export default function ChatPage() {
           <div className="flex items-center gap-4">
             <MobileBackLink />
             <div className="hidden sm:flex items-center">
-              {CHAT_WINDOW_AVATAR_STACK_URLS.map((src, index) => (
-                <div key={src} className={index === 0 ? "" : "-ml-2"}>
-                  <Avatar
-                    user={{
-                      name: CHAT_PAGE_COPY.stackAvatarPlaceholderName,
-                      avatarUrl: src,
-                    }}
-                    size="sm"
-                  />
-                </div>
-              ))}
-              <Typography
-                component="span"
-                className="-ml-2 grid h-8 min-w-8 place-items-center rounded-full border border-blue-400 px-2 font-semibold text-[#e5efff]"
-              >
-                {CHAT_PAGE_COPY.overflowCountLabel}
-              </Typography>
+              {headerAvatars.length > 0 ? (
+                headerAvatars.map((src, index) => (
+                  <div key={`${src}-${index}`} className={index === 0 ? "" : "-ml-2"}>
+                    <Avatar
+                      user={{
+                        name: CHAT_PAGE_COPY.stackAvatarPlaceholderName,
+                        avatarUrl: src,
+                      }}
+                      size="sm"
+                    />
+                  </div>
+                ))
+              ) : (
+                <Avatar
+                  user={{ name: activeConversation.title }}
+                  size="sm"
+                />
+              )}
+              {overflowCount > 0 ? (
+                <Typography
+                  component="span"
+                  className="-ml-2 grid h-8 min-w-8 place-items-center rounded-full border border-blue-400 px-2 font-semibold text-[#e5efff]"
+                >
+                  +{overflowCount}
+                </Typography>
+              ) : null}
             </div>
             <div>
               <Typography component="h2" variantStyle="subtitle" className="text-sm">
@@ -75,18 +100,45 @@ export default function ChatPage() {
 
           <Button type="button" variant="text" color="error">
             <BiExit className="text-sm" />
-            Leave Group
+            {CHAT_PAGE_COPY.leaveGroup}
           </Button>
         </div>
       </header>
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5">
-        {MESSAGES.map((message) => (
-          <MessageBubble key={message.id} message={message} />
-        ))}
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        {messagesLoading ? (
+          <div className="flex h-full items-center justify-center px-4 py-8">
+            <Typography component="p" variantStyle="caption" className="text-white/60">
+              Loading messages…
+            </Typography>
+          </div>
+        ) : messagesError ? (
+          <div className="flex h-full flex-col items-center justify-center gap-2 px-4 py-8">
+            <Typography component="p" variantStyle="caption" className="text-center text-red-200/90">
+              {messagesError}
+            </Typography>
+          </div>
+        ) : (
+          <div className="hide-scrollbar h-full space-y-4 overflow-y-auto px-4 py-5">
+            {messages.length === 0 ? (
+              <Typography component="p" variantStyle="caption" className="text-center text-white/50">
+                No messages yet. Say hello.
+              </Typography>
+            ) : (
+              messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))
+            )}
+          </div>
+        )}
       </div>
 
-      <ChatCompose />
+      <ChatCompose
+        onSend={send}
+        disabled={messagesLoading || Boolean(messagesError)}
+        isSending={isSending}
+        sendError={sendError}
+      />
     </div>
   );
 }

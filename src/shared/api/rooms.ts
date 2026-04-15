@@ -2,7 +2,7 @@ import { apiJson } from "./client";
 import { getApiBaseUrl } from "./config";
 import type { RoomDetailDto, RoomListItemDto } from "./types/room";
 
-function roomsBasePath(): string {
+export function roomsBasePath(): string {
   return `${getApiBaseUrl()}/rooms`;
 }
 

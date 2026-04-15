@@ -1,4 +1,5 @@
 import { Typography } from "@promentorapp/ui-kit";
+import { useHostAuthSession } from "../../features/auth";
 import { CreateGroupLink } from "../../shared/ui/CreateGroupLink";
 import { useChatSidebarModel } from "./model/useChatSidebarModel";
 import { ConversationListItem } from "./ui/ConversationListItem";
@@ -9,6 +10,7 @@ type ChatSidebarProps = {
 };
 
 export default function ChatSidebar({ className }: ChatSidebarProps) {
+  const { session, isBridgeAvailable, isHydrating } = useHostAuthSession();
   const {
     search,
     directMessages,
@@ -19,57 +21,87 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
     status: roomsStatus,
   } = useChatSidebarModel();
 
+  const sessionLabel = (() => {
+    if (isHydrating) {
+      return "Loading session…";
+    }
+    if (!isBridgeAvailable) {
+      return "Auth bridge unavailable";
+    }
+    if (session.isAuthenticated && session.user) {
+      return session.user.fullName;
+    }
+    return "Not signed in";
+  })();
+
   return (
     <div
       className={[
-        "w-full flex-col gap-5 rounded-lg sm:border border-white/20 p-4 sm:p-2 md:w-[280px]",
-        visibilityClassName,
+        "flex w-full flex-col gap-3 rounded-lg sm:border border-white/20 p-4 sm:p-2 md:w-[280px]",
         className ?? "",
       ].join(" ")}
     >
-      <GlobalChatSearch
-        query={search.query}
-        setQuery={search.setQuery}
-        isOpen={search.isOpen}
-        setIsOpen={search.setIsOpen}
-        containerRef={search.containerRef}
-        filteredUsers={search.filteredUsers}
-      />
-
-      {errorMessage ? (
-        <Typography component="p" variantStyle="caption" className="text-amber-200/90">
-          {errorMessage}
-        </Typography>
-      ) : null}
-
-      {roomsStatus === "loading" ? (
+      <div className="rounded-lg border border-white/15 bg-white/5 px-3 py-2">
         <Typography component="p" variantStyle="caption" className="text-white/50">
-          Loading conversations…
+          Signed in as
         </Typography>
-      ) : null}
+        <Typography component="p" variantStyle="subtitle" className="truncate text-sm">
+          {sessionLabel}
+        </Typography>
+        {session.user ? (
+          <Typography component="p" variantStyle="caption" className="mt-0.5 truncate text-white/45">
+            {session.user.email}
+          </Typography>
+        ) : null}
+      </div>
 
-      <section>
-        <Typography component="p" variantStyle="eyebrow" className={categoryClassName}>
-          Direct Messages
-        </Typography>
-        <div className="flex flex-col gap-2">
-          {directMessages.map((conversation) => (
-            <ConversationListItem key={conversation.id} conversation={conversation} />
-          ))}
-        </div>
-      </section>
+      <div
+        className={["flex flex-col gap-5", visibilityClassName].join(" ")}
+      >
+        <GlobalChatSearch
+          query={search.query}
+          setQuery={search.setQuery}
+          isOpen={search.isOpen}
+          setIsOpen={search.setIsOpen}
+          containerRef={search.containerRef}
+          filteredUsers={search.filteredUsers}
+        />
 
-      <section>
-        <Typography component="p" variantStyle="eyebrow" className={categoryClassName}>
-          Groups
-        </Typography>
-        <div className="flex flex-col gap-2">
-          {groupMessages.map((conversation) => (
-            <ConversationListItem key={conversation.id} conversation={conversation} />
-          ))}
-          <CreateGroupLink />
-        </div>
-      </section>
+        {errorMessage ? (
+          <Typography component="p" variantStyle="caption" className="text-amber-200/90">
+            {errorMessage}
+          </Typography>
+        ) : null}
+
+        {roomsStatus === "loading" ? (
+          <Typography component="p" variantStyle="caption" className="text-white/50">
+            Loading conversations…
+          </Typography>
+        ) : null}
+
+        <section>
+          <Typography component="p" variantStyle="eyebrow" className={categoryClassName}>
+            Direct Messages
+          </Typography>
+          <div className="flex flex-col gap-2">
+            {directMessages.map((conversation) => (
+              <ConversationListItem key={conversation.id} conversation={conversation} />
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <Typography component="p" variantStyle="eyebrow" className={categoryClassName}>
+            Groups
+          </Typography>
+          <div className="flex flex-col gap-2">
+            {groupMessages.map((conversation) => (
+              <ConversationListItem key={conversation.id} conversation={conversation} />
+            ))}
+            <CreateGroupLink />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
