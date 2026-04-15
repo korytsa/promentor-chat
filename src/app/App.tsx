@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import ChatPage from "../pages/chat";
 import CreateGroupPage from "../pages/create-group";
-import ProfilePage from "../pages/profile";
 import { AppBackground } from "../shared/ui/AppBackground";
 import ChatEmptyPage from "../pages/empty-chat/ui/Page";
 import { ChatSidebar } from "../widgets";
@@ -15,8 +14,6 @@ export default function App() {
           <Route path="/" element={<ChatEmptyPage />} />
           <Route path="/chat/:chatId" element={<ChatPage />} />
           <Route path="/chat/create-group" element={<CreateGroupPage />} />
-          <Route path="/chat/profile" element={<ProfilePage />} />
-          <Route path="/chat/profile/:slug" element={<ProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

@@ -1,6 +1,4 @@
-import { Typography, Avatar } from "@promentorapp/ui-kit";
-import { Link } from "react-router-dom";
-import { CURRENT_USER_PROFILE } from "../../entities/profile";
+import { Typography } from "@promentorapp/ui-kit";
 import { CreateGroupLink } from "../../shared/ui/CreateGroupLink";
 import { useChatSidebarModel } from "./model/useChatSidebarModel";
 import { ConversationListItem } from "./ui/ConversationListItem";
@@ -22,26 +20,6 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
         className ?? "",
       ].join(" ")}
     >
-      <section className="border-b border-white/20 pb-2">
-        <Link to="/chat/profile" className="flex items-center gap-3">
-          <Avatar
-            user={{
-              name: CURRENT_USER_PROFILE.displayName,
-              avatarUrl: CURRENT_USER_PROFILE.avatarUrl,
-            }}
-            size="md"
-          />
-          <div>
-            <Typography component="p" variantStyle="title">
-              {CURRENT_USER_PROFILE.displayName}
-            </Typography>
-            <Typography component="p" className="text-xs text-green-600">
-              Online
-            </Typography>
-          </div>
-        </Link>
-      </section>
-
       <GlobalChatSearch
         query={search.query}
         setQuery={search.setQuery}

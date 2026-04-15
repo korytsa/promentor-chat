@@ -73,7 +73,6 @@ export const MESSAGES: ChatMessage[] = [
     time: "10:42 AM",
     avatarUrl:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&q=80",
-    authorProfileSlug: "sarah-chen",
     text: "Hey team! I uploaded the latest mobile dark mode prototype. Can you review the elevation tokens?",
   },
   {
@@ -83,7 +82,6 @@ export const MESSAGES: ChatMessage[] = [
     time: "10:45 AM",
     avatarUrl:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80",
-    authorProfileSlug: "alex-rivera",
     text: "Checking now. The surface color feels bright on OLED, maybe we can shift it slightly deeper.",
   },
   {
@@ -93,7 +91,6 @@ export const MESSAGES: ChatMessage[] = [
     time: "11:02 AM",
     avatarUrl:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80",
-    authorProfileSlug: "marcus-thorne",
     text: "Agreed. If we move it closer to deep navy, the contrast still passes and the interface looks calmer.",
   },
 ];
