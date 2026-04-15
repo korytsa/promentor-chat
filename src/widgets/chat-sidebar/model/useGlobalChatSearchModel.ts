@@ -1,11 +1,11 @@
 import { useId, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { KeyboardEvent } from "react";
-import type { SearchUser } from "../../../entities/chat";
+import type { ChatSearchOption } from "../../../entities/chat";
 
 type Params = {
   isOpen: boolean;
-  filteredUsers: SearchUser[];
+  filteredUsers: ChatSearchOption[];
   setQuery: (value: string) => void;
   setIsOpen: (value: boolean) => void;
 };
@@ -33,7 +33,7 @@ export function useGlobalChatSearchModel({ isOpen, filteredUsers, setQuery, setI
       return;
     }
 
-    navigate(`/chat/${user.chatId}`);
+    navigate(`/chat/${user.id}`);
     setQuery("");
     closeListbox();
   };

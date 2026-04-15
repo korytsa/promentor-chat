@@ -1,4 +1,4 @@
-export type { ChatMessage, Conversation, MessageRole } from "./model/types";
+export type { ChatMessage, ChatSearchOption, Conversation, MessageRole } from "./model/types";
 export {
   CHAT_WINDOW_AVATAR_STACK_URLS,
   CONVERSATIONS,

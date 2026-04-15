@@ -9,8 +9,15 @@ type ChatSidebarProps = {
 };
 
 export default function ChatSidebar({ className }: ChatSidebarProps) {
-  const { search, directMessages, groupMessages, categoryClassName, visibilityClassName } =
-    useChatSidebarModel();
+  const {
+    search,
+    directMessages,
+    groupMessages,
+    categoryClassName,
+    visibilityClassName,
+    errorMessage,
+    status: roomsStatus,
+  } = useChatSidebarModel();
 
   return (
     <div
@@ -28,6 +35,18 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
         containerRef={search.containerRef}
         filteredUsers={search.filteredUsers}
       />
+
+      {errorMessage ? (
+        <Typography component="p" variantStyle="caption" className="text-amber-200/90">
+          {errorMessage}
+        </Typography>
+      ) : null}
+
+      {roomsStatus === "loading" ? (
+        <Typography component="p" variantStyle="caption" className="text-white/50">
+          Loading conversations…
+        </Typography>
+      ) : null}
 
       <section>
         <Typography component="p" variantStyle="eyebrow" className={categoryClassName}>

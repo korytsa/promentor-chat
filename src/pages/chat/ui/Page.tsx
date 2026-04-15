@@ -1,4 +1,3 @@
-import { Navigate } from "react-router-dom";
 import { Typography, Avatar, Button } from "@promentorapp/ui-kit";
 import { BiExit } from "react-icons/bi";
 import { CHAT_WINDOW_AVATAR_STACK_URLS, MESSAGES, MessageBubble } from "../../../entities/chat";
@@ -14,8 +13,27 @@ export default function ChatPage() {
     return null;
   }
 
-  if (state.status === "redirect") {
-    return <Navigate to={state.to} replace={state.replace} />;
+  if (state.status === "loading") {
+    return (
+      <div className="flex min-h-0 flex-1 items-center justify-center sm:rounded-lg sm:border border-white/20 px-4 py-12">
+        <Typography component="p" variantStyle="body">
+          Loading conversation…
+        </Typography>
+      </div>
+    );
+  }
+
+  if (state.status === "error") {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 sm:rounded-lg sm:border border-white/20 px-4 py-12">
+        <Typography component="p" variantStyle="subtitle">
+          Something went wrong
+        </Typography>
+        <Typography component="p" variantStyle="caption" className="text-center text-white/70">
+          {state.message}
+        </Typography>
+      </div>
+    );
   }
 
   const { activeConversation } = state.viewModel;

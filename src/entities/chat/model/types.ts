@@ -6,6 +6,12 @@ export type Conversation = {
   avatarUrls: string[];
 };
 
+export type ChatSearchOption = {
+  id: string;
+  name: string;
+  avatarUrl: string;
+};
+
 export type MessageRole = "assistant" | "user";
 
 export type ChatMessage = {

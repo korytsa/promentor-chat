@@ -1,6 +1,6 @@
 import { Typography, TextField } from "@promentorapp/ui-kit";
 import { FiSearch } from "react-icons/fi";
-import type { SearchUser } from "../../../entities/chat";
+import type { ChatSearchOption } from "../../../entities/chat";
 import type { RefObject } from "react";
 import { useGlobalChatSearchModel } from "../model/useGlobalChatSearchModel";
 import { UserListItem } from "../../../shared/ui/UserListItem";
@@ -8,7 +8,7 @@ import { UserListItem } from "../../../shared/ui/UserListItem";
 type Props = {
   query: string;
   isOpen: boolean;
-  filteredUsers: SearchUser[];
+  filteredUsers: ChatSearchOption[];
   setQuery: (value: string) => void;
   setIsOpen: (value: boolean) => void;
   containerRef: RefObject<HTMLDivElement | null>;
