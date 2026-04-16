@@ -7,6 +7,7 @@ import { MobileBackLink } from "../../../shared/ui/MobileBackLink";
 import { CHAT_PAGE_COPY } from "../model/constants";
 import { useChatPage } from "../model/useChatPage";
 import { useChatRoomMessages } from "../model/useChatRoomMessages";
+import { useLeaveRoom } from "../model/useLeaveRoom";
 
 export default function ChatPage() {
   const { chatId } = useParams();
@@ -19,6 +20,11 @@ export default function ChatPage() {
     isSending,
     sendError,
   } = useChatRoomMessages(chatId);
+
+  const { leave, busy: leaveBusy, error: leaveError } = useLeaveRoom(
+    chatId,
+    pageState.status === "ready" ? pageState.viewModel.activeConversation.category : undefined,
+  );
 
   if (pageState.status === "empty") {
     return null;
@@ -48,6 +54,10 @@ export default function ChatPage() {
   }
 
   const { activeConversation } = pageState.viewModel;
+  const leaveLabel =
+    activeConversation.category === "direct"
+      ? CHAT_PAGE_COPY.leaveDirect
+      : CHAT_PAGE_COPY.leaveGroup;
   const headerAvatars = activeConversation.avatarUrls.slice(0, 3);
   const overflowCount =
     activeConversation.avatarUrls.length > 3
@@ -98,10 +108,23 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <Button type="button" variant="text" color="error">
-            <BiExit className="text-sm" />
-            {CHAT_PAGE_COPY.leaveGroup}
-          </Button>
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              type="button"
+              variant="text"
+              color="error"
+              disabled={leaveBusy}
+              onClick={() => void leave()}
+            >
+              <BiExit className="text-sm" />
+              {leaveLabel}
+            </Button>
+            {leaveError ? (
+              <Typography component="p" variantStyle="caption" className="max-w-[12rem] text-right text-red-200/90">
+                {leaveError}
+              </Typography>
+            ) : null}
+          </div>
         </div>
       </header>
 

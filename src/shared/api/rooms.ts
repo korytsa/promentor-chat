@@ -1,4 +1,4 @@
-import { apiJson } from "./client";
+import { apiFetch, apiJson } from "./client";
 import { getApiBaseUrl } from "./config";
 import type { CreateRoomDto, RoomDetailDto, RoomListItemDto } from "./types/room";
 
@@ -19,5 +19,11 @@ export async function createRoom(body: CreateRoomDto): Promise<RoomDetailDto> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
+  });
+}
+
+export async function removeSelfFromRoom(roomId: string): Promise<void> {
+  await apiFetch(`${roomsBasePath()}/${encodeURIComponent(roomId)}/members/me`, {
+    method: "DELETE",
   });
 }

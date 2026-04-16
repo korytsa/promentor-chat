@@ -2,7 +2,8 @@ export const CHAT_PAGE_COPY = {
   stackAvatarPlaceholderName: "Team member",
   overflowCountLabel: "+8",
   activeNowLabel: "12 active now",
-  leaveGroup: "Leave Group",
+  leaveDirect: "Leave chat",
+  leaveGroup: "Leave group",
 } as const;
 
 export const CHAT_ROOM_LOAD_MESSAGES_FAILURE = {
@@ -13,6 +14,12 @@ export const CHAT_ROOM_LOAD_MESSAGES_FAILURE = {
 export const CHAT_ROOM_SEND_MESSAGE_FAILURE = {
   fallback: "Could not send message.",
   unauthorized: "Sign in to send messages.",
+} as const;
+
+export const CHAT_LEAVE_ROOM_FAILURE = {
+  fallback: "Could not leave this chat.",
+  unauthorized: "Sign in to leave this chat.",
+  notFound: "This chat is no longer available.",
 } as const;
 
 export const CHAT_SEARCH_DM_FAILURE = {

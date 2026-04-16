@@ -11,6 +11,7 @@ import {
   CHAT_SEARCH_DM_FAILURE,
   CHAT_SIDEBAR_USER_SEARCH_FAILURE,
 } from "../../../pages/chat/model/constants";
+import { CHAT_ROOMS_INVALIDATE_EVENT } from "../../../shared/lib/chatRoomsInvalidate";
 import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
 import { useUserSearch } from "../../../shared/lib/useUserSearch";
@@ -51,6 +52,7 @@ export function useChatSidebarModel() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [dmCreateError, setDmCreateError] = useState<string | null>(null);
+  const [roomsRefetchNonce, setRoomsRefetchNonce] = useState(0);
 
   const setQuery = useCallback((value: string) => {
     setDmCreateError(null);
@@ -68,6 +70,14 @@ export function useChatSidebarModel() {
     () => (userSearchActive ? dtos.map(mapUserSearchDtoToChatOption) : []),
     [userSearchActive, dtos],
   );
+
+  useEffect(() => {
+    const onInvalidate = () => {
+      setRoomsRefetchNonce((n) => n + 1);
+    };
+    window.addEventListener(CHAT_ROOMS_INVALIDATE_EVENT, onInvalidate);
+    return () => window.removeEventListener(CHAT_ROOMS_INVALIDATE_EVENT, onInvalidate);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -99,7 +109,7 @@ export function useChatSidebarModel() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [roomsRefetchNonce]);
 
   const q = query.trim().toLowerCase();
 
