@@ -10,7 +10,8 @@ export {
   removeSelfFromRoom,
   roomsBasePath,
 } from "./rooms";
-export { searchUsers, usersBasePath } from "./users";
+export { fetchAuthMe, authBasePath } from "./auth";
+export { fetchUsers, searchUsers, usersBasePath } from "./users";
 export { fetchRoomMessages, markRoomRead, sendRoomMessage } from "./messages";
 export type { MarkRoomReadBody } from "./messages";
 export type {
@@ -20,4 +21,10 @@ export type {
   RoomListItemDto,
 } from "./types/room";
 export type { MessageDto, MessagesPageDto, MessageSenderDto } from "./types/message";
-export type { UserSearchResultDto } from "./types/user";
+export type {
+  AuthUserResponseDto,
+  UserRole,
+  UserSearchItemDto,
+  UserSearchResultDto,
+  UsersListPageDto,
+} from "./types/user";

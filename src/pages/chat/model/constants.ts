@@ -43,3 +43,8 @@ export const CHAT_SIDEBAR_USER_SEARCH_FAILURE = {
   unauthorized: "Sign in to search users.",
   rateLimited: "Too many searches. Wait a moment and try again.",
 } as const;
+
+export const CHAT_SIDEBAR_USERS_DIRECTORY_FAILURE = {
+  fallback: "Could not load people.",
+  unauthorized: "Sign in to see people.",
+} as const;

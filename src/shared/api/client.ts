@@ -1,6 +1,46 @@
+import { getApiBaseUrl } from "./config";
 import { ApiError } from "./error";
 
-/** NestJS-style JSON errors: `message` may be a string or string[] (validation). */
+let refreshInFlight: Promise<boolean> | null = null;
+
+async function tryRefreshSession(): Promise<boolean> {
+  if (refreshInFlight) {
+    return refreshInFlight;
+  }
+  refreshInFlight = (async () => {
+    try {
+      const base = getApiBaseUrl();
+      const r = await fetch(`${base}/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+        headers: { Accept: "application/json" },
+      });
+      return r.ok;
+    } catch {
+      return false;
+    }
+  })();
+  try {
+    return await refreshInFlight;
+  } finally {
+    refreshInFlight = null;
+  }
+}
+
+async function apiFetchOnce(url: string | URL, init: RequestInit, retried: boolean): Promise<Response> {
+  const response = await fetch(url, init);
+  if (response.ok) {
+    return response;
+  }
+  if (response.status === 401 && !retried) {
+    const refreshed = await tryRefreshSession();
+    if (refreshed) {
+      return apiFetchOnce(url, init, true);
+    }
+  }
+  return response;
+}
+
 function readErrorMessageFromBody(bodyText: string): string | null {
   if (!bodyText) {
     return null;
@@ -30,11 +70,13 @@ export async function apiFetch(url: string | URL, init: RequestInit = {}): Promi
     headers.set("Accept", "application/json");
   }
 
-  const response = await fetch(url, {
+  const merged: RequestInit = {
     ...init,
     credentials: "include",
     headers,
-  });
+  };
+
+  const response = await apiFetchOnce(url, merged, false);
 
   if (response.ok) {
     return response;

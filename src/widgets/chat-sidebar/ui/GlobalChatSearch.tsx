@@ -15,6 +15,8 @@ type Props = {
   onSelectOption: (option: ChatSearchOption) => boolean | Promise<boolean>;
   userSearchLoading?: boolean;
   userSearchError?: string | null;
+  directoryLoading?: boolean;
+  directoryError?: string | null;
   dmCreateError?: string | null;
 };
 
@@ -28,6 +30,8 @@ export function GlobalChatSearch({
   onSelectOption,
   userSearchLoading,
   userSearchError,
+  directoryLoading,
+  directoryError,
   dmCreateError,
 }: Props) {
   const {
@@ -95,9 +99,18 @@ export function GlobalChatSearch({
             ))
           ) : (
             <Typography component="p" variantStyle="caption">
-              {userSearchLoading ? "Searching…" : "No users found"}
+              {userSearchLoading
+                ? "Searching…"
+                : directoryLoading
+                  ? "Loading people…"
+                  : "No users found"}
             </Typography>
           )}
+          {directoryError ? (
+            <Typography component="p" variantStyle="caption" className="mt-2 text-amber-200/90">
+              {directoryError}
+            </Typography>
+          ) : null}
           {userSearchError ? (
             <Typography component="p" variantStyle="caption" className="mt-2 text-amber-200/90">
               {userSearchError}

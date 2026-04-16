@@ -3,6 +3,7 @@ import type { RefObject } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SearchUser } from "../../../entities/chat";
 import { mapUserSearchDtoToSearchUser } from "../../../entities/chat/model/mapUserSearchDto";
+import { useHostAuthSession } from "../../../features/auth";
 import { createRoom, parseApiFailure } from "../../../shared/api";
 import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
@@ -35,6 +36,7 @@ export type CreateGroupPageViewModel = {
 };
 
 export function useCreateGroupPage(): CreateGroupPageViewModel {
+  const { session } = useHostAuthSession();
   const navigate = useNavigate();
   const [groupName, setGroupName] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<SearchUser[]>([]);
@@ -51,6 +53,7 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
     debouncedQuery,
     minQueryLength: USER_SEARCH_MIN_QUERY_LEN,
     parseFailure: CREATE_GROUP_SEARCH_FAILURE,
+    excludeUserId: session.user?.id,
   });
 
   const [submitBusy, setSubmitBusy] = useState(false);

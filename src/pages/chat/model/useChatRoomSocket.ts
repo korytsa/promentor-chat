@@ -129,13 +129,12 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     if (!socket?.connected || !roomId) {
       return;
     }
-    const uid = selfUserIdRef.current;
-    socket.emit(CHAT_SOCKET_EVENTS.typing, { roomId, typing: true, userId: uid });
+    socket.emit(CHAT_SOCKET_EVENTS.typing, { roomId, typing: true });
     if (typingIdleTimerRef.current) {
       clearTimeout(typingIdleTimerRef.current);
     }
     typingIdleTimerRef.current = setTimeout(() => {
-      socket.emit(CHAT_SOCKET_EVENTS.typing, { roomId, typing: false, userId: uid });
+      socket.emit(CHAT_SOCKET_EVENTS.typing, { roomId, typing: false });
       typingIdleTimerRef.current = null;
     }, CHAT_TYPING_IDLE_MS);
   }, [roomId]);

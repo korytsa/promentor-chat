@@ -4,7 +4,6 @@ export type ParseApiFailureOptions = {
   fallback: string;
   unauthorized?: string;
   notFound?: string;
-  /** HTTP 429 Too Many Requests */
   rateLimited?: string;
 };
 

@@ -19,7 +19,7 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
     visibilityClassName,
     errorMessage,
     status: roomsStatus,
-  } = useChatSidebarModel();
+  } = useChatSidebarModel({ excludeUserId: session.user?.id });
 
   const sessionLabel = (() => {
     if (isHydrating) {
@@ -68,6 +68,8 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
           onSelectOption={search.onSelectSearchOption}
           userSearchLoading={search.userSearchLoading}
           userSearchError={search.userSearchError}
+          directoryLoading={search.directoryLoading}
+          directoryError={search.directoryError}
           dmCreateError={search.dmCreateError}
         />
 

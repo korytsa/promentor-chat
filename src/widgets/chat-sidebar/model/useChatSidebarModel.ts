@@ -6,15 +6,20 @@ import {
   mapRoomListItemToConversation,
   sortRoomsByUpdatedAtDesc,
 } from "../../../entities/chat/model/mapRoomListItem";
-import { mapUserSearchDtoToChatOption } from "../../../entities/chat/model/mapUserSearchDto";
+import {
+  mapAuthUserToChatOption,
+  mapUserSearchDtoToChatOption,
+} from "../../../entities/chat/model/mapUserSearchDto";
 import {
   CHAT_SEARCH_DM_FAILURE,
+  CHAT_SIDEBAR_USERS_DIRECTORY_FAILURE,
   CHAT_SIDEBAR_USER_SEARCH_FAILURE,
 } from "../../../pages/chat/model/constants";
 import { CHAT_ROOMS_INVALIDATE_EVENT } from "../../../shared/lib/chatRoomsInvalidate";
 import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
 import { useUserSearch } from "../../../shared/lib/useUserSearch";
+import { useUsersDirectory } from "../../../shared/lib/useUsersDirectory";
 import { SIDEBAR_CONVERSATION_CATEGORY_CLASS } from "./constants";
 
 type LoadStatus = "loading" | "ready" | "error";
@@ -40,7 +45,12 @@ function toSearchOptions(conversations: Conversation[]): ChatSearchOption[] {
   }));
 }
 
-export function useChatSidebarModel() {
+type UseChatSidebarModelOptions = {
+  excludeUserId?: string;
+};
+
+export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
+  const excludeUserId = options?.excludeUserId;
   const location = useLocation();
   const navigate = useNavigate();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -64,11 +74,29 @@ export function useChatSidebarModel() {
       debouncedQuery,
       minQueryLength: USER_SEARCH_MIN_QUERY_LEN,
       parseFailure: CHAT_SIDEBAR_USER_SEARCH_FAILURE,
+      excludeUserId,
     });
+
+  const directoryEnabled = isOpen && query.trim().length < USER_SEARCH_MIN_QUERY_LEN;
+
+  const {
+    items: directoryUsers,
+    loading: directoryLoading,
+    error: directoryError,
+  } = useUsersDirectory({
+    enabled: directoryEnabled,
+    excludeUserId,
+    parseFailure: CHAT_SIDEBAR_USERS_DIRECTORY_FAILURE,
+  });
 
   const remoteUserOptions = useMemo(
     () => (userSearchActive ? dtos.map(mapUserSearchDtoToChatOption) : []),
     [userSearchActive, dtos],
+  );
+
+  const directoryOptions = useMemo(
+    () => directoryUsers.map(mapAuthUserToChatOption),
+    [directoryUsers],
   );
 
   useEffect(() => {
@@ -124,11 +152,21 @@ export function useChatSidebarModel() {
 
   const filteredUsers = useMemo(() => {
     const localMatches = searchOptions.filter((u) => u.name.toLowerCase().includes(q));
-    if (!userSearchActive) {
-      return localMatches;
+    if (userSearchActive) {
+      return [...localMatches, ...remoteUserOptions];
     }
-    return [...localMatches, ...remoteUserOptions];
-  }, [searchOptions, q, userSearchActive, remoteUserOptions]);
+    if (directoryEnabled && directoryOptions.length > 0) {
+      return [...directoryOptions, ...localMatches];
+    }
+    return localMatches;
+  }, [
+    searchOptions,
+    q,
+    userSearchActive,
+    remoteUserOptions,
+    directoryEnabled,
+    directoryOptions,
+  ]);
 
   const isListRoute = location.pathname === "/" || location.pathname === "/chat";
   const visibilityClassName = isListRoute ? "flex md:flex" : "hidden md:flex";
@@ -174,6 +212,8 @@ export function useChatSidebarModel() {
       onSelectSearchOption,
       userSearchLoading,
       userSearchError,
+      directoryLoading,
+      directoryError,
       dmCreateError,
     },
     directMessages,

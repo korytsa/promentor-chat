@@ -38,7 +38,6 @@ export async function sendRoomMessage(
 }
 
 export type MarkRoomReadBody = {
-  /** Last message the user has seen; backend marks the room read up to this message. */
   messageId?: string;
 };
 

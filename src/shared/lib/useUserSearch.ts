@@ -9,12 +9,14 @@ type UseUserSearchParams = {
   debouncedQuery: string;
   minQueryLength: number;
   parseFailure: ParseApiFailureOptions;
+  excludeUserId?: string;
 };
 
 export function useUserSearch({
   debouncedQuery,
   minQueryLength,
   parseFailure,
+  excludeUserId,
 }: UseUserSearchParams) {
   const [dtos, setDtos] = useState<UserSearchResultDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,11 @@ export function useUserSearch({
         if (cancelled) {
           return;
         }
-        setDtos(rows);
+        const filtered =
+          excludeUserId != null && excludeUserId !== ""
+            ? rows.filter((r) => r.id !== excludeUserId)
+            : rows;
+        setDtos(filtered);
       })
       .catch((err: unknown) => {
         if (cancelled || isAbortError(err)) {
@@ -59,7 +65,7 @@ export function useUserSearch({
       cancelled = true;
       ac.abort();
     };
-  }, [debouncedQuery, minQueryLength, parseFailure]);
+  }, [debouncedQuery, minQueryLength, parseFailure, excludeUserId]);
 
   const active = debouncedQuery.length >= minQueryLength;
 
