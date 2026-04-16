@@ -6,6 +6,7 @@ import {
   parseApiFailure,
   sendRoomMessage,
 } from "../../../shared/api";
+import type { MessageDto } from "../../../shared/api/types/message";
 import { useHostAuthSession } from "../../../features/auth";
 import type { ChatRoomMessageView } from "../../../entities/chat";
 import {
@@ -20,18 +21,9 @@ import {
   CHAT_ROOM_LOAD_OLDER_FAILURE,
   CHAT_ROOM_SEND_MESSAGE_FAILURE,
 } from "./constants";
+import { appendIncomingDto, buildPaginationFromPage } from "./chatRoomMessageUtils";
 import { patchReadyForRoom, type MessagesPaginationState, type RemoteMessages } from "./remoteMessagesPatch";
-
-function buildPaginationFromPage(page: {
-  total: number;
-  offset: number;
-  items: unknown[];
-}): MessagesPaginationState {
-  return {
-    total: page.total,
-    nextOffset: page.offset + page.items.length,
-  };
-}
+import { useChatRoomSocket } from "./useChatRoomSocket";
 
 export function useChatRoomMessages(
   roomId: string | undefined,
@@ -57,6 +49,29 @@ export function useChatRoomMessages(
   useEffect(() => {
     loadingOlderRef.current = loadingOlder;
   }, [loadingOlder]);
+
+  const onIncomingDto = useCallback(
+    (dto: MessageDto) => {
+      setRemote((prev) => {
+        if (!prev || prev.roomId !== roomId || prev.kind !== "ready") {
+          return prev;
+        }
+        if (dto.roomId !== roomId) {
+          return prev;
+        }
+        return appendIncomingDto(prev, dto);
+      });
+    },
+    [roomId],
+  );
+
+  const {
+    socketConnectionError,
+    socketRoomError,
+    othersTyping,
+    presenceOnlineCount,
+    notifyTypingActivity,
+  } = useChatRoomSocket({ roomId, onIncomingDto });
 
   useEffect(() => {
     if (!roomId) {
@@ -227,6 +242,25 @@ export function useChatRoomMessages(
       loadingOlder,
       loadOlderError,
       loadOlder,
+      socketConnectionError,
+      socketRoomError,
+      othersTyping,
+      presenceOnlineCount,
+      notifyTypingActivity,
     };
-  }, [roomId, remote, send, isSending, sendError, loadingOlder, loadOlderError, loadOlder]);
+  }, [
+    roomId,
+    remote,
+    send,
+    isSending,
+    sendError,
+    loadingOlder,
+    loadOlderError,
+    loadOlder,
+    socketConnectionError,
+    socketRoomError,
+    othersTyping,
+    presenceOnlineCount,
+    notifyTypingActivity,
+  ]);
 }

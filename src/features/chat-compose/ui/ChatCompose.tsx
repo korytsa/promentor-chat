@@ -13,9 +13,16 @@ type ChatComposeProps = {
   disabled?: boolean;
   isSending?: boolean;
   sendError?: string | null;
+  onTypingActivity?: () => void;
 };
 
-export function ChatCompose({ onSend, disabled, isSending, sendError }: ChatComposeProps) {
+export function ChatCompose({
+  onSend,
+  disabled,
+  isSending,
+  sendError,
+  onTypingActivity,
+}: ChatComposeProps) {
   const [value, setValue] = useState("");
 
   const handleSubmit = (event: FormEvent) => {
@@ -73,6 +80,7 @@ export function ChatCompose({ onSend, disabled, isSending, sendError }: ChatComp
               const next = e.target.value;
               if (next.length <= CHAT_MESSAGE_MAX_LENGTH) {
                 setValue(next);
+                onTypingActivity?.();
               }
             }}
             placeholder="Type your message..."

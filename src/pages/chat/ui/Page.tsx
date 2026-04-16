@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { MessageBubble } from "../../../entities/chat";
 import { ChatCompose } from "../../../features/chat-compose";
 import { MobileBackLink } from "../../../shared/ui/MobileBackLink";
-import { CHAT_PAGE_COPY } from "../model/constants";
+import { CHAT_PAGE_COPY, CHAT_SCROLL_LOAD_TOP_PX } from "../model/constants";
 import { useChatPage } from "../model/useChatPage";
 import { useChatRoomMessages } from "../model/useChatRoomMessages";
 import { useLeaveRoom } from "../model/useLeaveRoom";
@@ -32,6 +32,11 @@ export default function ChatPage() {
     loadingOlder,
     loadOlderError,
     loadOlder,
+    socketConnectionError,
+    socketRoomError,
+    othersTyping,
+    presenceOnlineCount,
+    notifyTypingActivity,
   } = useChatRoomMessages(chatId, messagesScrollRef);
 
   useLayoutEffect(() => {
@@ -51,7 +56,7 @@ export default function ChatPage() {
     if (!el || !hasMoreOlder || loadingOlder || scrollLoadLockRef.current) {
       return;
     }
-    if (el.scrollTop >= 72) {
+    if (el.scrollTop >= CHAT_SCROLL_LOAD_TOP_PX) {
       return;
     }
     scrollLoadLockRef.current = true;
@@ -142,8 +147,15 @@ export default function ChatPage() {
                 {activeConversation.title}
               </Typography>
               <Typography component="p" variantStyle="caption" className="text-xs text-[#1bd695]">
-                {CHAT_PAGE_COPY.activeNowLabel}
+                {presenceOnlineCount != null
+                  ? `${presenceOnlineCount} online`
+                  : CHAT_PAGE_COPY.activeNowLabel}
               </Typography>
+              {othersTyping ? (
+                <Typography component="p" variantStyle="caption" className="text-xs text-white/55">
+                  {CHAT_PAGE_COPY.typingOthers}
+                </Typography>
+              ) : null}
             </div>
           </div>
 
@@ -186,6 +198,16 @@ export default function ChatPage() {
             onScroll={handleMessagesScroll}
             className="hide-scrollbar h-full space-y-4 overflow-y-auto px-4 py-5"
           >
+            {socketConnectionError ? (
+              <Typography component="p" variantStyle="caption" className="mb-2 text-center text-amber-200/90">
+                {socketConnectionError}
+              </Typography>
+            ) : null}
+            {socketRoomError ? (
+              <Typography component="p" variantStyle="caption" className="mb-2 text-center text-red-200/90">
+                {socketRoomError}
+              </Typography>
+            ) : null}
             {loadOlderError ? (
               <Typography component="p" variantStyle="caption" className="mb-2 text-center text-red-200/90">
                 {loadOlderError}
@@ -214,6 +236,7 @@ export default function ChatPage() {
         disabled={messagesLoading || Boolean(messagesError)}
         isSending={isSending}
         sendError={sendError}
+        onTypingActivity={notifyTypingActivity}
       />
     </div>
   );
