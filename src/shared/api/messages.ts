@@ -37,7 +37,15 @@ export async function sendRoomMessage(
   return JSON.parse(text) as MessageDto;
 }
 
-export async function markRoomRead(roomId: string, body: Record<string, unknown> = {}): Promise<void> {
+export type MarkRoomReadBody = {
+  /** Last message the user has seen; backend marks the room read up to this message. */
+  messageId?: string;
+};
+
+export async function markRoomRead(
+  roomId: string,
+  body: MarkRoomReadBody = {},
+): Promise<void> {
   await apiFetch(`${roomsBasePath()}/${encodeURIComponent(roomId)}/read`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -37,6 +37,7 @@ export default function ChatPage() {
     othersTyping,
     presenceOnlineCount,
     notifyTypingActivity,
+    onMessagesScrollForReadReceipt,
   } = useChatRoomMessages(chatId, messagesScrollRef);
 
   useLayoutEffect(() => {
@@ -53,7 +54,11 @@ export default function ChatPage() {
 
   const handleMessagesScroll = useCallback(() => {
     const el = messagesScrollRef.current;
-    if (!el || !hasMoreOlder || loadingOlder || scrollLoadLockRef.current) {
+    if (!el) {
+      return;
+    }
+    onMessagesScrollForReadReceipt();
+    if (!hasMoreOlder || loadingOlder || scrollLoadLockRef.current) {
       return;
     }
     if (el.scrollTop >= CHAT_SCROLL_LOAD_TOP_PX) {
@@ -63,7 +68,7 @@ export default function ChatPage() {
     void loadOlder().finally(() => {
       scrollLoadLockRef.current = false;
     });
-  }, [hasMoreOlder, loadingOlder, loadOlder]);
+  }, [hasMoreOlder, loadingOlder, loadOlder, onMessagesScrollForReadReceipt]);
 
   const { leave, busy: leaveBusy, error: leaveError } = useLeaveRoom(
     chatId,
@@ -146,11 +151,11 @@ export default function ChatPage() {
               <Typography component="h2" variantStyle="subtitle" className="text-sm">
                 {activeConversation.title}
               </Typography>
-              <Typography component="p" variantStyle="caption" className="text-xs text-[#1bd695]">
-                {presenceOnlineCount != null
-                  ? `${presenceOnlineCount} online`
-                  : CHAT_PAGE_COPY.activeNowLabel}
-              </Typography>
+              {presenceOnlineCount != null ? (
+                <Typography component="p" variantStyle="caption" className="text-xs text-[#1bd695]">
+                  {presenceOnlineCount} online
+                </Typography>
+              ) : null}
               {othersTyping ? (
                 <Typography component="p" variantStyle="caption" className="text-xs text-white/55">
                   {CHAT_PAGE_COPY.typingOthers}

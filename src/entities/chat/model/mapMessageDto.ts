@@ -32,6 +32,19 @@ export function buildOptimisticOwnMessage(
   };
 }
 
+export function latestServerMessageId(
+  items: readonly ChatRoomMessageView[],
+): string | undefined {
+  for (let i = items.length - 1; i >= 0; i--) {
+    const m = items[i];
+    if (m.pending || m.id.startsWith(OPTIMISTIC_MESSAGE_ID_PREFIX)) {
+      continue;
+    }
+    return m.id;
+  }
+  return undefined;
+}
+
 export function sortMessagesByCreatedAt(
   items: readonly ChatRoomMessageView[],
 ): ChatRoomMessageView[] {

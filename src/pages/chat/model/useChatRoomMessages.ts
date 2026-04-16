@@ -11,11 +11,14 @@ import { useHostAuthSession } from "../../../features/auth";
 import type { ChatRoomMessageView } from "../../../entities/chat";
 import {
   buildOptimisticOwnMessage,
+  latestServerMessageId,
   mapMessageDtoToView,
   mergeMessageList,
 } from "../../../entities/chat/model/mapMessageDto";
 import {
   CHAT_MESSAGE_PAGE_SIZE,
+  CHAT_READ_SCROLL_BOTTOM_PX,
+  CHAT_READ_SCROLL_DEBOUNCE_MS,
   CHAT_ROOM_LOAD_MESSAGES_FAILURE,
   CHAT_ROOM_LOAD_OLDER_FAILURE,
   CHAT_ROOM_SEND_MESSAGE_FAILURE,
@@ -48,6 +51,30 @@ export function useChatRoomMessages(
   useEffect(() => {
     loadingOlderRef.current = loadingOlder;
   }, [loadingOlder]);
+
+  const lastMarkedReadMessageIdRef = useRef<string | null>(null);
+  const readReceiptScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const itemsRef = useRef<ChatRoomMessageView[]>([]);
+
+  useEffect(() => {
+    lastMarkedReadMessageIdRef.current = null;
+  }, [roomId]);
+
+  useEffect(() => {
+    return () => {
+      if (readReceiptScrollTimerRef.current) {
+        clearTimeout(readReceiptScrollTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (roomId !== undefined && remote !== null && remote.roomId === roomId && remote.kind === "ready") {
+      itemsRef.current = remote.items;
+    } else {
+      itemsRef.current = [];
+    }
+  }, [roomId, remote]);
 
   const onIncomingDto = useCallback(
     (dto: MessageDto) => {
@@ -93,7 +120,9 @@ export function useChatRoomMessages(
           items,
           pagination,
         });
-        void markRoomRead(roomId, {}).catch(() => {});
+        const mid = latestServerMessageId(items);
+        lastMarkedReadMessageIdRef.current = mid ?? null;
+        void markRoomRead(roomId, mid ? { messageId: mid } : {}).catch(() => {});
       })
       .catch((err: unknown) => {
         if (cancelled) {
@@ -163,6 +192,62 @@ export function useChatRoomMessages(
     prevLoadingOlderRef.current = loadingOlder;
   }, [loadingOlder, messagesScrollRef]);
 
+  const readReceiptFingerprint =
+    remote?.kind === "ready" && roomId !== undefined && remote.roomId === roomId
+      ? `${remote.items.length}:${latestServerMessageId(remote.items) ?? ""}`
+      : "";
+
+  useLayoutEffect(() => {
+    if (!roomId || remote?.kind !== "ready" || remote.roomId !== roomId) {
+      return;
+    }
+    const el = messagesScrollRef?.current;
+    if (!el) {
+      return;
+    }
+    const mid = latestServerMessageId(remote.items);
+    if (!mid || mid === lastMarkedReadMessageIdRef.current) {
+      return;
+    }
+    const gap = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (gap > CHAT_READ_SCROLL_BOTTOM_PX) {
+      return;
+    }
+    lastMarkedReadMessageIdRef.current = mid;
+    void markRoomRead(roomId, { messageId: mid }).catch(() => {});
+  }, [roomId, remote, messagesScrollRef, readReceiptFingerprint]);
+
+  const onMessagesScrollForReadReceipt = useCallback(() => {
+    const el = messagesScrollRef?.current;
+    if (!el || !roomId) {
+      return;
+    }
+    const gap = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (gap > CHAT_READ_SCROLL_BOTTOM_PX) {
+      return;
+    }
+    if (readReceiptScrollTimerRef.current) {
+      clearTimeout(readReceiptScrollTimerRef.current);
+    }
+    readReceiptScrollTimerRef.current = setTimeout(() => {
+      readReceiptScrollTimerRef.current = null;
+      const el2 = messagesScrollRef?.current;
+      if (!el2 || !roomId) {
+        return;
+      }
+      const gap2 = el2.scrollHeight - el2.scrollTop - el2.clientHeight;
+      if (gap2 > CHAT_READ_SCROLL_BOTTOM_PX) {
+        return;
+      }
+      const mid = latestServerMessageId(itemsRef.current);
+      if (!mid || mid === lastMarkedReadMessageIdRef.current) {
+        return;
+      }
+      lastMarkedReadMessageIdRef.current = mid;
+      void markRoomRead(roomId, { messageId: mid }).catch(() => {});
+    }, CHAT_READ_SCROLL_DEBOUNCE_MS);
+  }, [roomId, messagesScrollRef]);
+
   const send = useCallback(
     async (text: string) => {
       if (!roomId) {
@@ -187,6 +272,8 @@ export function useChatRoomMessages(
               return mergeMessageList(next, mapMessageDtoToView(created));
             }),
           );
+          lastMarkedReadMessageIdRef.current = created.id;
+          void markRoomRead(roomId, { messageId: created.id }).catch(() => {});
         } else {
           const { items, pagination } = await loadInitialRoomMessages(roomId);
           setRemote({
@@ -239,5 +326,6 @@ export function useChatRoomMessages(
     othersTyping,
     presenceOnlineCount,
     notifyTypingActivity,
+    onMessagesScrollForReadReceipt,
   };
 }

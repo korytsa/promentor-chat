@@ -12,6 +12,7 @@ export {
 } from "./rooms";
 export { searchUsers, usersBasePath } from "./users";
 export { fetchRoomMessages, markRoomRead, sendRoomMessage } from "./messages";
+export type { MarkRoomReadBody } from "./messages";
 export type {
   ChatRoomTypeResponse,
   CreateRoomDto,

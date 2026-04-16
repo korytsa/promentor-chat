@@ -1,19 +1,16 @@
 export const CHAT_PAGE_COPY = {
   stackAvatarPlaceholderName: "Team member",
   overflowCountLabel: "+8",
-  activeNowLabel: "12 active now",
   typingOthers: "Someone is typing…",
   leaveDirect: "Leave chat",
   leaveGroup: "Leave group",
 } as const;
 
 export const CHAT_MESSAGE_PAGE_SIZE = 30;
-
-/** Idle delay before emitting typing: active false (ms). */
 export const CHAT_TYPING_IDLE_MS = 1800;
-
-/** Near top of scroll area — triggers loading older messages (px). */
 export const CHAT_SCROLL_LOAD_TOP_PX = 72;
+export const CHAT_READ_SCROLL_BOTTOM_PX = 96;
+export const CHAT_READ_SCROLL_DEBOUNCE_MS = 320;
 
 export const CHAT_ROOM_LOAD_MESSAGES_FAILURE = {
   fallback: "Could not load messages.",
