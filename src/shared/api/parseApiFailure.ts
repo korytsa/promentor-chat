@@ -4,6 +4,8 @@ export type ParseApiFailureOptions = {
   fallback: string;
   unauthorized?: string;
   notFound?: string;
+  /** HTTP 429 Too Many Requests */
+  rateLimited?: string;
 };
 
 export function parseApiFailure(err: unknown, options: ParseApiFailureOptions): string {
@@ -13,6 +15,9 @@ export function parseApiFailure(err: unknown, options: ParseApiFailureOptions): 
     }
     if (err.status === 404 && options.notFound !== undefined) {
       return options.notFound;
+    }
+    if (err.status === 429 && options.rateLimited !== undefined) {
+      return options.rateLimited;
     }
   }
   if (err instanceof Error) {

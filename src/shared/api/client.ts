@@ -1,5 +1,6 @@
 import { ApiError } from "./error";
 
+/** NestJS-style JSON errors: `message` may be a string or string[] (validation). */
 function readErrorMessageFromBody(bodyText: string): string | null {
   if (!bodyText) {
     return null;
@@ -10,13 +11,15 @@ function readErrorMessageFromBody(bodyText: string): string | null {
   } catch {
     return null;
   }
-  if (
-    typeof parsed === "object" &&
-    parsed !== null &&
-    "message" in parsed &&
-    typeof (parsed as { message: unknown }).message === "string"
-  ) {
-    return (parsed as { message: string }).message;
+  if (typeof parsed !== "object" || parsed === null || !("message" in parsed)) {
+    return null;
+  }
+  const msg = (parsed as { message: unknown }).message;
+  if (typeof msg === "string") {
+    return msg;
+  }
+  if (Array.isArray(msg) && msg.every((m) => typeof m === "string")) {
+    return msg.join(" ");
   }
   return null;
 }

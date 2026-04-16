@@ -4,6 +4,10 @@ import { useHostAuthSession } from "../../../features/auth";
 import { getOrCreateChatSocket } from "../../../shared/lib/chatSocket";
 import { CHAT_SOCKET_EVENTS } from "../../../shared/lib/chatSocketEvents";
 import { parseMessageDtoFromSocket } from "../../../shared/lib/parseSocketMessageDto";
+import {
+  parseChatRoomPresencePayload,
+  parseChatTypingPayload,
+} from "../../../shared/lib/chatSocketPayloads";
 import { readSocketErrorMessage } from "../../../shared/lib/socketPayloadHelpers";
 import { CHAT_TYPING_IDLE_MS } from "./constants";
 
@@ -78,37 +82,22 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     };
 
     const onTyping = (raw: unknown) => {
-      if (!raw || typeof raw !== "object") {
+      const parsed = parseChatTypingPayload(raw, roomIdRef.current);
+      if (!parsed || parsed.userId === selfUserIdRef.current) {
         return;
       }
-      const o = raw as Record<string, unknown>;
-      const rid = typeof o.roomId === "string" ? o.roomId : null;
-      if (rid !== roomIdRef.current) {
-        return;
-      }
-      const userId = typeof o.userId === "string" ? o.userId : null;
-      if (!userId || userId === selfUserIdRef.current) {
-        return;
-      }
-      const active = o.active === true;
+      const { userId, typing } = parsed;
       setTypingRemoteUserIds((prev) => {
-        if (active) {
+        if (typing) {
           return prev.includes(userId) ? prev : [...prev, userId];
         }
         return prev.filter((id) => id !== userId);
       });
     };
 
-    const onPresence = (raw: unknown) => {
-      if (!raw || typeof raw !== "object") {
-        return;
-      }
-      const o = raw as Record<string, unknown>;
-      if (typeof o.roomId !== "string" || o.roomId !== roomIdRef.current) {
-        return;
-      }
-      const n = o.onlineCount ?? o.membersOnlineCount;
-      if (typeof n === "number") {
+    const onRoomPresence = (raw: unknown) => {
+      const n = parseChatRoomPresencePayload(raw, roomIdRef.current);
+      if (n !== null) {
         setPresenceOnlineCount(n);
       }
     };
@@ -118,7 +107,7 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     socket.on(CHAT_SOCKET_EVENTS.newMessage, onNewMessage);
     socket.on(CHAT_SOCKET_EVENTS.error, onChatError);
     socket.on(CHAT_SOCKET_EVENTS.typing, onTyping);
-    socket.on(CHAT_SOCKET_EVENTS.presence, onPresence);
+    socket.on(CHAT_SOCKET_EVENTS.roomPresence, onRoomPresence);
 
     if (socket.connected) {
       joinActiveRoom();
@@ -131,7 +120,7 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
       socket.off(CHAT_SOCKET_EVENTS.newMessage, onNewMessage);
       socket.off(CHAT_SOCKET_EVENTS.error, onChatError);
       socket.off(CHAT_SOCKET_EVENTS.typing, onTyping);
-      socket.off(CHAT_SOCKET_EVENTS.presence, onPresence);
+      socket.off(CHAT_SOCKET_EVENTS.roomPresence, onRoomPresence);
     };
   }, [roomId]);
 
@@ -141,12 +130,12 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
       return;
     }
     const uid = selfUserIdRef.current;
-    socket.emit(CHAT_SOCKET_EVENTS.typing, { roomId, active: true, userId: uid });
+    socket.emit(CHAT_SOCKET_EVENTS.typing, { roomId, typing: true, userId: uid });
     if (typingIdleTimerRef.current) {
       clearTimeout(typingIdleTimerRef.current);
     }
     typingIdleTimerRef.current = setTimeout(() => {
-      socket.emit(CHAT_SOCKET_EVENTS.typing, { roomId, active: false, userId: uid });
+      socket.emit(CHAT_SOCKET_EVENTS.typing, { roomId, typing: false, userId: uid });
       typingIdleTimerRef.current = null;
     }, CHAT_TYPING_IDLE_MS);
   }, [roomId]);

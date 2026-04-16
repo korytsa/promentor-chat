@@ -1,8 +1,9 @@
 export const CHAT_SOCKET_EVENTS = {
-  join: "join",
-  leave: "leave",
+  join: "chat:joinRoom",
+  leave: "chat:leaveRoom",
   newMessage: "chat:newMessage",
-  typing: "typing",
-  presence: "presence",
+  sendMessage: "chat:sendMessage",
+  typing: "chat:typing",
+  roomPresence: "chat:roomPresence",
   error: "chat:error",
 } as const;

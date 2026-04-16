@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import type { ParseApiFailureOptions } from "../api/parseApiFailure";
-import { parseApiFailure, searchUsers } from "../api";
+import { parseApiFailure } from "../api";
 import type { UserSearchResultDto } from "../api/types/user";
+import { USER_SEARCH_RESULT_LIMIT } from "./constants/userSearch";
+import { searchUsersWith429Retry, isAbortError } from "./userSearchFetch";
 
 type UseUserSearchParams = {
   debouncedQuery: string;
@@ -23,17 +25,17 @@ export function useUserSearch({
       return;
     }
 
+    const ac = new AbortController();
     let cancelled = false;
 
     void Promise.resolve().then(() => {
-      if (cancelled) {
-        return;
+      if (!cancelled) {
+        setLoading(true);
+        setError(null);
       }
-      setLoading(true);
-      setError(null);
     });
 
-    void searchUsers(debouncedQuery)
+    void searchUsersWith429Retry(debouncedQuery, USER_SEARCH_RESULT_LIMIT, ac.signal)
       .then((rows) => {
         if (cancelled) {
           return;
@@ -41,7 +43,7 @@ export function useUserSearch({
         setDtos(rows);
       })
       .catch((err: unknown) => {
-        if (cancelled) {
+        if (cancelled || isAbortError(err)) {
           return;
         }
         setDtos([]);
@@ -55,6 +57,7 @@ export function useUserSearch({
 
     return () => {
       cancelled = true;
+      ac.abort();
     };
   }, [debouncedQuery, minQueryLength, parseFailure]);
 

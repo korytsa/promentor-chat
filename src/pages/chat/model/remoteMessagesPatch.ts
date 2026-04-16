@@ -2,7 +2,7 @@ import type { ChatRoomMessageView } from "../../../entities/chat";
 
 export type MessagesPaginationState = {
   total: number;
-  nextOffset: number;
+  oldestLoadedOffset: number;
 };
 
 export type RemoteMessages =

@@ -44,4 +44,5 @@ export const CHAT_SEARCH_DM_FAILURE = {
 export const CHAT_SIDEBAR_USER_SEARCH_FAILURE = {
   fallback: "Could not search users.",
   unauthorized: "Sign in to search users.",
+  rateLimited: "Too many searches. Wait a moment and try again.",
 } as const;

@@ -15,6 +15,7 @@ export const CREATE_GROUP_PAGE_COPY = {
 export const CREATE_GROUP_SEARCH_FAILURE = {
   fallback: "Could not search members.",
   unauthorized: "Sign in to search members.",
+  rateLimited: "Too many searches. Wait a moment and try again.",
 } as const;
 
 export const CREATE_GROUP_CREATE_FAILURE = {

@@ -1,2 +1,4 @@
 export const USER_SEARCH_DEBOUNCE_MS = 300;
 export const USER_SEARCH_MIN_QUERY_LEN = 2;
+export const USER_SEARCH_RESULT_LIMIT = 20;
+export const USER_SEARCH_429_RETRY_DELAY_MS = 1000;

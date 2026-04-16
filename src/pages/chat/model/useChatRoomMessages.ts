@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import {
   fetchRoomMessages,
@@ -13,7 +13,6 @@ import {
   buildOptimisticOwnMessage,
   mapMessageDtoToView,
   mergeMessageList,
-  mergePrependedMessages,
 } from "../../../entities/chat/model/mapMessageDto";
 import {
   CHAT_MESSAGE_PAGE_SIZE,
@@ -21,7 +20,7 @@ import {
   CHAT_ROOM_LOAD_OLDER_FAILURE,
   CHAT_ROOM_SEND_MESSAGE_FAILURE,
 } from "./constants";
-import { appendIncomingDto, buildPaginationFromPage } from "./chatRoomMessageUtils";
+import { appendIncomingDto, loadInitialRoomMessages, mergeOlderMessagesPage } from "./chatRoomMessageUtils";
 import { patchReadyForRoom, type MessagesPaginationState, type RemoteMessages } from "./remoteMessagesPatch";
 import { useChatRoomSocket } from "./useChatRoomSocket";
 
@@ -52,6 +51,10 @@ export function useChatRoomMessages(
 
   const onIncomingDto = useCallback(
     (dto: MessageDto) => {
+      const resolved: MessageDto = {
+        ...dto,
+        isOwn: dto.senderId === session.user?.id,
+      };
       setRemote((prev) => {
         if (!prev || prev.roomId !== roomId || prev.kind !== "ready") {
           return prev;
@@ -59,10 +62,10 @@ export function useChatRoomMessages(
         if (dto.roomId !== roomId) {
           return prev;
         }
-        return appendIncomingDto(prev, dto);
+        return appendIncomingDto(prev, resolved);
       });
     },
-    [roomId],
+    [roomId, session.user?.id],
   );
 
   const {
@@ -79,16 +82,16 @@ export function useChatRoomMessages(
     }
     let cancelled = false;
 
-    fetchRoomMessages(roomId, { limit: CHAT_MESSAGE_PAGE_SIZE, offset: 0 })
-      .then((page) => {
+    void loadInitialRoomMessages(roomId)
+      .then(({ items, pagination }) => {
         if (cancelled) {
           return;
         }
         setRemote({
           roomId,
           kind: "ready",
-          items: page.items.map(mapMessageDtoToView),
-          pagination: buildPaginationFromPage(page),
+          items,
+          pagination,
         });
         void markRoomRead(roomId, {}).catch(() => {});
       })
@@ -113,7 +116,7 @@ export function useChatRoomMessages(
       return;
     }
     const p = paginationRef.current;
-    if (!p || p.nextOffset >= p.total) {
+    if (!p || p.oldestLoadedOffset <= 0) {
       return;
     }
 
@@ -127,23 +130,17 @@ export function useChatRoomMessages(
 
     setLoadingOlder(true);
     setLoadOlderError(null);
+    const nextOffset = Math.max(0, p.oldestLoadedOffset - CHAT_MESSAGE_PAGE_SIZE);
     try {
       const page = await fetchRoomMessages(roomId, {
         limit: CHAT_MESSAGE_PAGE_SIZE,
-        offset: p.nextOffset,
+        offset: nextOffset,
       });
-      const newViews = page.items.map(mapMessageDtoToView);
       setRemote((prev) => {
         if (!prev || prev.roomId !== roomId || prev.kind !== "ready") {
           return prev;
         }
-        const merged = mergePrependedMessages(prev.items, newViews);
-        return {
-          roomId,
-          kind: "ready",
-          items: merged,
-          pagination: buildPaginationFromPage(page),
-        };
+        return mergeOlderMessagesPage(prev, roomId, page);
       });
     } catch (err: unknown) {
       setLoadOlderError(parseApiFailure(err, CHAT_ROOM_LOAD_OLDER_FAILURE));
@@ -191,15 +188,12 @@ export function useChatRoomMessages(
             }),
           );
         } else {
-          const page = await fetchRoomMessages(roomId, {
-            limit: CHAT_MESSAGE_PAGE_SIZE,
-            offset: 0,
-          });
+          const { items, pagination } = await loadInitialRoomMessages(roomId);
           setRemote({
             roomId,
             kind: "ready",
-            items: page.items.map(mapMessageDtoToView),
-            pagination: buildPaginationFromPage(page),
+            items,
+            pagination,
           });
         }
       } catch (err: unknown) {
@@ -215,45 +209,28 @@ export function useChatRoomMessages(
     [roomId, session.user?.fullName],
   );
 
-  return useMemo(() => {
-    const isLoading =
-      roomId !== undefined && (!remote || remote.roomId !== roomId);
+  const isLoading = roomId !== undefined && (!remote || remote.roomId !== roomId);
 
-    let errorMessage: string | null = null;
-    let items: ChatRoomMessageView[] = [];
-    let hasMoreOlder = false;
-    if (roomId !== undefined && remote !== null && remote.roomId === roomId) {
-      if (remote.kind === "error") {
-        errorMessage = remote.message;
-      } else {
-        items = remote.items;
-        hasMoreOlder = remote.pagination.nextOffset < remote.pagination.total;
-      }
+  let errorMessage: string | null = null;
+  let items: ChatRoomMessageView[] = [];
+  let hasMoreOlder = false;
+  if (roomId !== undefined && remote !== null && remote.roomId === roomId) {
+    if (remote.kind === "error") {
+      errorMessage = remote.message;
+    } else {
+      items = remote.items;
+      hasMoreOlder = remote.pagination.oldestLoadedOffset > 0;
     }
+  }
 
-    return {
-      items,
-      isLoading,
-      errorMessage,
-      send,
-      isSending,
-      sendError,
-      hasMoreOlder,
-      loadingOlder,
-      loadOlderError,
-      loadOlder,
-      socketConnectionError,
-      socketRoomError,
-      othersTyping,
-      presenceOnlineCount,
-      notifyTypingActivity,
-    };
-  }, [
-    roomId,
-    remote,
+  return {
+    items,
+    isLoading,
+    errorMessage,
     send,
     isSending,
     sendError,
+    hasMoreOlder,
     loadingOlder,
     loadOlderError,
     loadOlder,
@@ -262,5 +239,5 @@ export function useChatRoomMessages(
     othersTyping,
     presenceOnlineCount,
     notifyTypingActivity,
-  ]);
+  };
 }

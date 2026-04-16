@@ -6,7 +6,11 @@ export function usersBasePath(): string {
   return `${getApiBaseUrl()}/users`;
 }
 
-export async function searchUsers(q: string, limit = 20): Promise<UserSearchResultDto[]> {
+export async function searchUsers(
+  q: string,
+  limit = 20,
+  init?: RequestInit,
+): Promise<UserSearchResultDto[]> {
   const params = new URLSearchParams({ q: q.trim(), limit: String(limit) });
-  return apiJson<UserSearchResultDto[]>(`${usersBasePath()}/search?${params}`);
+  return apiJson<UserSearchResultDto[]>(`${usersBasePath()}/search?${params}`, init ?? {});
 }
