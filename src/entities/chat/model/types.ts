@@ -10,6 +10,7 @@ export type ChatSearchOption = {
   id: string;
   name: string;
   avatarUrl: string;
+  isUserOnly?: boolean;
 };
 
 export type MessageRole = "assistant" | "user";

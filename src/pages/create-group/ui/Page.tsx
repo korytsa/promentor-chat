@@ -44,6 +44,8 @@ function MembersSelector({ state }: MembersSelectorProps) {
     selectedMemberIds,
     selectedMembers,
     filteredMembers,
+    searchLoading,
+    searchError,
     toggleMember,
     removeMember,
     onSelectorAreaClick,
@@ -98,17 +100,43 @@ function MembersSelector({ state }: MembersSelectorProps) {
             aria-labelledby="invite-members-label"
             className="hide-scrollbar max-h-[268px] overflow-y-auto border-t border-white/15 bg-transparent p-2"
           >
-            {filteredMembers.map((member) => (
-              <UserListItem
-                key={member.id}
-                name={member.name}
-                avatarUrl={member.avatarUrl}
-                onClick={() => toggleMember(member.id)}
-                isSelected={selectedMemberIds.includes(member.id)}
-                selectedLabel={CREATE_GROUP_PAGE_COPY.selectedBadge}
-                className="mb-2 last:mb-0"
-              />
-            ))}
+            {searchLoading ? (
+              <Typography component="p" variantStyle="caption" className="px-1 py-2">
+                {CREATE_GROUP_PAGE_COPY.searchingMembers}
+              </Typography>
+            ) : null}
+            {searchError ? (
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="px-1 py-2 text-amber-200/90"
+              >
+                {searchError}
+              </Typography>
+            ) : null}
+            {!searchLoading && !searchError
+              ? filteredMembers.map((member) => (
+                  <UserListItem
+                    key={member.id}
+                    name={member.name}
+                    avatarUrl={member.avatarUrl}
+                    onClick={() => toggleMember(member.id)}
+                    isSelected={selectedMemberIds.includes(member.id)}
+                    selectedLabel={CREATE_GROUP_PAGE_COPY.selectedBadge}
+                    className="mb-2 last:mb-0"
+                  />
+                ))
+              : null}
+            {!searchLoading && !searchError && filteredMembers.length === 0 && query.trim().length >= 2 ? (
+              <Typography component="p" variantStyle="caption" className="px-1 py-2">
+                No users match your search.
+              </Typography>
+            ) : null}
+            {!searchLoading && !searchError && query.trim().length < 2 ? (
+              <Typography component="p" variantStyle="caption" className="px-1 py-2 text-white/50">
+                Type at least 2 characters to search.
+              </Typography>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -116,11 +144,22 @@ function MembersSelector({ state }: MembersSelectorProps) {
   );
 }
 
-function ActionButtons() {
+type ActionButtonsProps = {
+  onSubmit: () => void;
+  submitBusy: boolean;
+};
+
+function ActionButtons({ onSubmit, submitBusy }: ActionButtonsProps) {
   return (
     <div className="mt-6 flex items-center gap-3">
-      <Button type="button" variant="contained" className="rounded-lg">
-        {CREATE_GROUP_PAGE_COPY.createButton}
+      <Button
+        type="button"
+        variant="contained"
+        className="rounded-lg"
+        onClick={onSubmit}
+        disabled={submitBusy}
+      >
+        {submitBusy ? "Creating…" : CREATE_GROUP_PAGE_COPY.createButton}
       </Button>
       <Link to="/" className="rounded-lg border border-white/20 px-4 py-1 hover:border-white/40">
         {CREATE_GROUP_PAGE_COPY.cancelButton}
@@ -152,11 +191,18 @@ export default function CreateGroupPage() {
             name="groupName"
             placeholder={CREATE_GROUP_PAGE_COPY.groupNamePlaceholder}
             size="sm"
+            value={state.groupName}
+            onChange={(event) => state.onGroupNameChange(event.target.value)}
             className="border-white/20 bg-transparent focus:border-[#2a6de5]"
           />
           <MembersSelector state={state} />
         </div>
-        <ActionButtons />
+        {state.submitError ? (
+          <Typography component="p" variantStyle="caption" className="mt-3 text-amber-200/90">
+            {state.submitError}
+          </Typography>
+        ) : null}
+        <ActionButtons onSubmit={state.onSubmit} submitBusy={state.submitBusy} />
       </div>
     </section>
   );

@@ -1,0 +1,2 @@
+export const USER_SEARCH_DEBOUNCE_MS = 300;
+export const USER_SEARCH_MIN_QUERY_LEN = 2;

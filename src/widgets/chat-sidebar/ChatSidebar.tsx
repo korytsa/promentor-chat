@@ -65,6 +65,10 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
           setIsOpen={search.setIsOpen}
           containerRef={search.containerRef}
           filteredUsers={search.filteredUsers}
+          onSelectOption={search.onSelectSearchOption}
+          userSearchLoading={search.userSearchLoading}
+          userSearchError={search.userSearchError}
+          dmCreateError={search.dmCreateError}
         />
 
         {errorMessage ? (

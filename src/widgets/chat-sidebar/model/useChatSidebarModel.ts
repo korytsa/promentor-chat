@@ -1,11 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { fetchRooms, parseApiFailure } from "../../../shared/api";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { createRoom, fetchRooms, parseApiFailure } from "../../../shared/api";
 import type { ChatSearchOption, Conversation } from "../../../entities/chat";
 import {
   mapRoomListItemToConversation,
   sortRoomsByUpdatedAtDesc,
 } from "../../../entities/chat/model/mapRoomListItem";
+import { mapUserSearchDtoToChatOption } from "../../../entities/chat/model/mapUserSearchDto";
+import {
+  CHAT_SEARCH_DM_FAILURE,
+  CHAT_SIDEBAR_USER_SEARCH_FAILURE,
+} from "../../../pages/chat/model/constants";
+import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
+import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
+import { useUserSearch } from "../../../shared/lib/useUserSearch";
 import { SIDEBAR_CONVERSATION_CATEGORY_CLASS } from "./constants";
 
 type LoadStatus = "loading" | "ready" | "error";
@@ -33,12 +41,33 @@ function toSearchOptions(conversations: Conversation[]): ChatSearchOption[] {
 
 export function useChatSidebarModel() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [status, setStatus] = useState<LoadStatus>("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
+  const [query, setQueryState] = useState("");
+  const debouncedQuery = useDebouncedValue(query, USER_SEARCH_DEBOUNCE_MS);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const [dmCreateError, setDmCreateError] = useState<string | null>(null);
+
+  const setQuery = useCallback((value: string) => {
+    setDmCreateError(null);
+    setQueryState(value);
+  }, []);
+
+  const { dtos, loading: userSearchLoading, error: userSearchError, active: userSearchActive } =
+    useUserSearch({
+      debouncedQuery,
+      minQueryLength: USER_SEARCH_MIN_QUERY_LEN,
+      parseFailure: CHAT_SIDEBAR_USER_SEARCH_FAILURE,
+    });
+
+  const remoteUserOptions = useMemo(
+    () => (userSearchActive ? dtos.map(mapUserSearchDtoToChatOption) : []),
+    [userSearchActive, dtos],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -83,10 +112,13 @@ export function useChatSidebarModel() {
     };
   }, [conversations]);
 
-  const filteredUsers = useMemo(
-    () => searchOptions.filter((u) => u.name.toLowerCase().includes(q)),
-    [searchOptions, q],
-  );
+  const filteredUsers = useMemo(() => {
+    const localMatches = searchOptions.filter((u) => u.name.toLowerCase().includes(q));
+    if (!userSearchActive) {
+      return localMatches;
+    }
+    return [...localMatches, ...remoteUserOptions];
+  }, [searchOptions, q, userSearchActive, remoteUserOptions]);
 
   const isListRoute = location.pathname === "/" || location.pathname === "/chat";
   const visibilityClassName = isListRoute ? "flex md:flex" : "hidden md:flex";
@@ -102,6 +134,25 @@ export function useChatSidebarModel() {
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, []);
 
+  const onSelectSearchOption = useCallback(
+    async (option: ChatSearchOption): Promise<boolean> => {
+      if (option.isUserOnly) {
+        try {
+          const room = await createRoom({ type: "private", memberIds: [option.id] });
+          navigate(`/chat/${room.id}`);
+          return true;
+        } catch (err: unknown) {
+          setDmCreateError(parseApiFailure(err, CHAT_SEARCH_DM_FAILURE));
+          return false;
+        }
+      }
+
+      navigate(`/chat/${option.id}`);
+      return true;
+    },
+    [navigate],
+  );
+
   return {
     search: {
       query,
@@ -110,6 +161,10 @@ export function useChatSidebarModel() {
       setIsOpen,
       containerRef,
       filteredUsers,
+      onSelectSearchOption,
+      userSearchLoading,
+      userSearchError,
+      dmCreateError,
     },
     directMessages,
     groupMessages,

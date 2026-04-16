@@ -4,7 +4,7 @@ export type SearchUser = {
   id: string;
   name: string;
   avatarUrl: string;
-  chatId: string;
+  chatId?: string;
 };
 
 export const CHAT_WINDOW_AVATAR_STACK_URLS = [

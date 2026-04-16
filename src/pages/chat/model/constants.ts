@@ -14,3 +14,13 @@ export const CHAT_ROOM_SEND_MESSAGE_FAILURE = {
   fallback: "Could not send message.",
   unauthorized: "Sign in to send messages.",
 } as const;
+
+export const CHAT_SEARCH_DM_FAILURE = {
+  fallback: "Could not start a direct chat.",
+  unauthorized: "Sign in to start a chat.",
+} as const;
+
+export const CHAT_SIDEBAR_USER_SEARCH_FAILURE = {
+  fallback: "Could not search users.",
+  unauthorized: "Sign in to search users.",
+} as const;

@@ -8,4 +8,16 @@ export const CREATE_GROUP_PAGE_COPY = {
   selectedBadge: "Selected",
   createButton: "Create group",
   cancelButton: "Cancel",
+  validationHint: "Enter a group name and invite at least one member.",
+  searchingMembers: "Searching…",
+} as const;
+
+export const CREATE_GROUP_SEARCH_FAILURE = {
+  fallback: "Could not search members.",
+  unauthorized: "Sign in to search members.",
+} as const;
+
+export const CREATE_GROUP_CREATE_FAILURE = {
+  fallback: "Could not create the group.",
+  unauthorized: "Sign in to create a group.",
 } as const;

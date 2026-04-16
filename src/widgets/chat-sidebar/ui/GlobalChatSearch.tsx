@@ -12,6 +12,10 @@ type Props = {
   setQuery: (value: string) => void;
   setIsOpen: (value: boolean) => void;
   containerRef: RefObject<HTMLDivElement | null>;
+  onSelectOption: (option: ChatSearchOption) => boolean | Promise<boolean>;
+  userSearchLoading?: boolean;
+  userSearchError?: string | null;
+  dmCreateError?: string | null;
 };
 
 export function GlobalChatSearch({
@@ -21,6 +25,10 @@ export function GlobalChatSearch({
   setIsOpen,
   containerRef,
   filteredUsers,
+  onSelectOption,
+  userSearchLoading,
+  userSearchError,
+  dmCreateError,
 }: Props) {
   const {
     listboxId,
@@ -30,7 +38,7 @@ export function GlobalChatSearch({
     handleKeyDown,
     handleOptionMouseEnter,
     handleOptionClick,
-  } = useGlobalChatSearchModel({ isOpen, filteredUsers, setQuery, setIsOpen });
+  } = useGlobalChatSearchModel({ isOpen, filteredUsers, setQuery, setIsOpen, onSelectOption });
 
   return (
     <section ref={containerRef} className="relative w-full sm:max-w-xs">
@@ -73,7 +81,7 @@ export function GlobalChatSearch({
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user, index) => (
               <UserListItem
-                key={user.id}
+                key={`${user.isUserOnly ? "u" : "r"}-${user.id}`}
                 id={`${listboxId}-option-${index}`}
                 role="option"
                 ariaSelected={index === normalizedActiveIndex}
@@ -81,15 +89,25 @@ export function GlobalChatSearch({
                 name={user.name}
                 avatarUrl={user.avatarUrl}
                 onMouseEnter={() => handleOptionMouseEnter(index)}
-                onClick={() => handleOptionClick(index)}
+                onClick={() => void handleOptionClick(index)}
                 className="mb-2 last:mb-0"
               />
             ))
           ) : (
             <Typography component="p" variantStyle="caption">
-              No users found
+              {userSearchLoading ? "Searching…" : "No users found"}
             </Typography>
           )}
+          {userSearchError ? (
+            <Typography component="p" variantStyle="caption" className="mt-2 text-amber-200/90">
+              {userSearchError}
+            </Typography>
+          ) : null}
+          {dmCreateError ? (
+            <Typography component="p" variantStyle="caption" className="mt-2 text-amber-200/90">
+              {dmCreateError}
+            </Typography>
+          ) : null}
         </div>
       ) : null}
     </section>
