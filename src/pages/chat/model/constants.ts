@@ -6,9 +6,16 @@ export const CHAT_PAGE_COPY = {
   leaveGroup: "Leave group",
 } as const;
 
+export const CHAT_MESSAGE_PAGE_SIZE = 30;
+
 export const CHAT_ROOM_LOAD_MESSAGES_FAILURE = {
   fallback: "Could not load messages.",
   unauthorized: "Sign in to view messages.",
+} as const;
+
+export const CHAT_ROOM_LOAD_OLDER_FAILURE = {
+  fallback: "Could not load older messages.",
+  unauthorized: "Sign in to load messages.",
 } as const;
 
 export const CHAT_ROOM_SEND_MESSAGE_FAILURE = {

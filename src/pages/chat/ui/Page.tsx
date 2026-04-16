@@ -1,5 +1,6 @@
 import { Typography, Avatar, Button } from "@promentorapp/ui-kit";
 import { BiExit } from "react-icons/bi";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { MessageBubble } from "../../../entities/chat";
 import { ChatCompose } from "../../../features/chat-compose";
@@ -12,6 +13,14 @@ import { useLeaveRoom } from "../model/useLeaveRoom";
 export default function ChatPage() {
   const { chatId } = useParams();
   const pageState = useChatPage();
+  const messagesScrollRef = useRef<HTMLDivElement>(null);
+  const didInitialScrollRef = useRef(false);
+  const scrollLoadLockRef = useRef(false);
+
+  useEffect(() => {
+    didInitialScrollRef.current = false;
+  }, [chatId]);
+
   const {
     items: messages,
     isLoading: messagesLoading,
@@ -19,7 +28,37 @@ export default function ChatPage() {
     send,
     isSending,
     sendError,
-  } = useChatRoomMessages(chatId);
+    hasMoreOlder,
+    loadingOlder,
+    loadOlderError,
+    loadOlder,
+  } = useChatRoomMessages(chatId, messagesScrollRef);
+
+  useLayoutEffect(() => {
+    if (messagesLoading || messages.length === 0) {
+      return;
+    }
+    const el = messagesScrollRef.current;
+    if (!el || didInitialScrollRef.current) {
+      return;
+    }
+    el.scrollTop = el.scrollHeight;
+    didInitialScrollRef.current = true;
+  }, [messagesLoading, messages.length, chatId]);
+
+  const handleMessagesScroll = useCallback(() => {
+    const el = messagesScrollRef.current;
+    if (!el || !hasMoreOlder || loadingOlder || scrollLoadLockRef.current) {
+      return;
+    }
+    if (el.scrollTop >= 72) {
+      return;
+    }
+    scrollLoadLockRef.current = true;
+    void loadOlder().finally(() => {
+      scrollLoadLockRef.current = false;
+    });
+  }, [hasMoreOlder, loadingOlder, loadOlder]);
 
   const { leave, busy: leaveBusy, error: leaveError } = useLeaveRoom(
     chatId,
@@ -142,7 +181,21 @@ export default function ChatPage() {
             </Typography>
           </div>
         ) : (
-          <div className="hide-scrollbar h-full space-y-4 overflow-y-auto px-4 py-5">
+          <div
+            ref={messagesScrollRef}
+            onScroll={handleMessagesScroll}
+            className="hide-scrollbar h-full space-y-4 overflow-y-auto px-4 py-5"
+          >
+            {loadOlderError ? (
+              <Typography component="p" variantStyle="caption" className="mb-2 text-center text-red-200/90">
+                {loadOlderError}
+              </Typography>
+            ) : null}
+            {loadingOlder ? (
+              <Typography component="p" variantStyle="caption" className="mb-2 text-center text-white/45">
+                Loading older messages…
+              </Typography>
+            ) : null}
             {messages.length === 0 ? (
               <Typography component="p" variantStyle="caption" className="text-center text-white/50">
                 No messages yet. Say hello.

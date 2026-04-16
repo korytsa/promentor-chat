@@ -49,3 +49,17 @@ export function mergeMessageList(
   }
   return sortMessagesByCreatedAt([...items, next]);
 }
+
+export function mergePrependedMessages(
+  existing: ChatRoomMessageView[],
+  older: ChatRoomMessageView[],
+): ChatRoomMessageView[] {
+  const byId = new Map<string, ChatRoomMessageView>();
+  for (const m of older) {
+    byId.set(m.id, m);
+  }
+  for (const m of existing) {
+    byId.set(m.id, m);
+  }
+  return sortMessagesByCreatedAt([...byId.values()]);
+}
