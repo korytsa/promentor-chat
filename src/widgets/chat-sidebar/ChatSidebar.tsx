@@ -1,6 +1,4 @@
-import { useEffect } from "react";
 import { Typography } from "@promentorapp/ui-kit";
-import { useHostAuthSession } from "../../features/auth";
 import { CreateGroupLink } from "../../shared/ui/CreateGroupLink";
 import { useChatSidebarModel } from "./model/useChatSidebarModel";
 import { ConversationListItem } from "./ui/ConversationListItem";
@@ -11,13 +9,8 @@ type ChatSidebarProps = {
 };
 
 export default function ChatSidebar({ className }: ChatSidebarProps) {
-  const { session } = useHostAuthSession();
   const { search, directMessages, groupMessages, categoryClassName, visibilityClassName } =
     useChatSidebarModel();
-
-  useEffect(() => {
-    console.log(session.user);
-  }, [session]);
 
   return (
     <div
