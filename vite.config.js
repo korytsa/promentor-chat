@@ -5,8 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const shellRemote =
-    env.VITE_SHELL_REMOTE_URL || "http://localhost:5173/assets/remoteEntry.js";
+  const shellRemoteUrl = env.VITE_SHELL_REMOTE_URL || "http://localhost:5173/assets/remoteEntry.js";
+  const apiTarget = (env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
 
   return {
     plugins: [
@@ -14,10 +14,10 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       federation({
         name: "chatApp",
-        remotes: {
-          shell: shellRemote,
-        },
         filename: "remoteEntry.js",
+        remotes: {
+          shell: shellRemoteUrl,
+        },
         exposes: {
           "./ChatEmptyPage": "./src/pages/empty-chat/index.ts",
           "./ChatConversationPage": "./src/pages/chat/index.ts",
@@ -31,6 +31,9 @@ export default defineConfig(({ mode }) => {
       port: 4174,
       strictPort: true,
       cors: true,
+      proxy: {
+        "/auth": { target: apiTarget, changeOrigin: true },
+      },
     },
     preview: {
       port: 4174,
