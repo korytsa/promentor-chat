@@ -5,7 +5,8 @@ import type { SearchUser } from "../../../entities/chat";
 import { mapUserSearchDtoToSearchUser } from "../../../entities/chat/model/mapUserSearchDto";
 import { useHostAuthSession } from "../../../features/auth";
 import { createRoom, parseApiFailure } from "../../../shared/api";
-import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
+import { dispatchChatRoomsInvalidate } from "../../../shared/lib/chatRoomsInvalidate";
+import { USER_SEARCH_DEBOUNCE_MS } from "../../../shared/lib/constants/userSearch";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
 import { useUserSearch } from "../../../shared/lib/useUserSearch";
 import {
@@ -28,6 +29,7 @@ export type CreateGroupPageViewModel = {
   searchError: string | null;
   submitBusy: boolean;
   submitError: string | null;
+  canSubmit: boolean;
   onSubmit: () => void;
   toggleMember: (memberId: string) => void;
   removeMember: (memberId: string) => void;
@@ -51,7 +53,7 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
 
   const { dtos, loading: searchLoading, error: searchError, active: searchActive } = useUserSearch({
     debouncedQuery,
-    minQueryLength: USER_SEARCH_MIN_QUERY_LEN,
+    minQueryLength: 1,
     parseFailure: CREATE_GROUP_SEARCH_FAILURE,
     excludeUserId: session.user?.id,
   });
@@ -95,6 +97,7 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
     }
 
     setSelectedMembers([...current, row]);
+    setQuery("");
   };
 
   const removeMember = (memberId: string) => {
@@ -111,9 +114,11 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
     setIsDropdownOpen(true);
   };
 
+  const canSubmit = groupName.trim().length > 0 && selectedMembers.length >= 2;
+
   const onSubmit = useCallback(async () => {
     const name = groupName.trim();
-    if (!name || selectedMembers.length === 0) {
+    if (!name || selectedMembers.length < 2) {
       setSubmitError(CREATE_GROUP_PAGE_COPY.validationHint);
       return;
     }
@@ -126,6 +131,7 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
         name,
         memberIds: selectedMembers.map((m) => m.id),
       });
+      dispatchChatRoomsInvalidate();
       navigate(`/chat/${room.id}`);
     } catch (err: unknown) {
       setSubmitError(parseApiFailure(err, CREATE_GROUP_CREATE_FAILURE));
@@ -159,6 +165,7 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
     searchError,
     submitBusy,
     submitError,
+    canSubmit,
     onSubmit,
     toggleMember,
     removeMember,

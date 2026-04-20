@@ -127,14 +127,9 @@ function MembersSelector({ state }: MembersSelectorProps) {
                   />
                 ))
               : null}
-            {!searchLoading && !searchError && filteredMembers.length === 0 && query.trim().length >= 2 ? (
+            {!searchLoading && !searchError && filteredMembers.length === 0 && query.trim().length > 0 ? (
               <Typography component="p" variantStyle="caption" className="px-1 py-2">
                 No users match your search.
-              </Typography>
-            ) : null}
-            {!searchLoading && !searchError && query.trim().length < 2 ? (
-              <Typography component="p" variantStyle="caption" className="px-1 py-2 text-white/50">
-                Type at least 2 characters to search.
               </Typography>
             ) : null}
           </div>
@@ -147,9 +142,10 @@ function MembersSelector({ state }: MembersSelectorProps) {
 type ActionButtonsProps = {
   onSubmit: () => void;
   submitBusy: boolean;
+  canSubmit: boolean;
 };
 
-function ActionButtons({ onSubmit, submitBusy }: ActionButtonsProps) {
+function ActionButtons({ onSubmit, submitBusy, canSubmit }: ActionButtonsProps) {
   return (
     <div className="mt-6 flex items-center gap-3">
       <Button
@@ -157,7 +153,7 @@ function ActionButtons({ onSubmit, submitBusy }: ActionButtonsProps) {
         variant="contained"
         className="rounded-lg"
         onClick={onSubmit}
-        disabled={submitBusy}
+        disabled={submitBusy || !canSubmit}
       >
         {submitBusy ? "Creating…" : CREATE_GROUP_PAGE_COPY.createButton}
       </Button>
@@ -202,7 +198,11 @@ export default function CreateGroupPage() {
             {state.submitError}
           </Typography>
         ) : null}
-        <ActionButtons onSubmit={state.onSubmit} submitBusy={state.submitBusy} />
+        <ActionButtons
+          onSubmit={state.onSubmit}
+          submitBusy={state.submitBusy}
+          canSubmit={state.canSubmit}
+        />
       </div>
     </section>
   );

@@ -15,7 +15,10 @@ import {
   CHAT_SIDEBAR_USERS_DIRECTORY_FAILURE,
   CHAT_SIDEBAR_USER_SEARCH_FAILURE,
 } from "../../../pages/chat/model/constants";
-import { CHAT_ROOMS_INVALIDATE_EVENT } from "../../../shared/lib/chatRoomsInvalidate";
+import {
+  CHAT_ROOMS_INVALIDATE_EVENT,
+  dispatchChatRoomsInvalidate,
+} from "../../../shared/lib/chatRoomsInvalidate";
 import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
 import { useUserSearch } from "../../../shared/lib/useUserSearch";
@@ -209,6 +212,7 @@ export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
       if (option.isUserOnly) {
         try {
           const room = await createRoom({ type: "private", memberIds: [option.id] });
+          dispatchChatRoomsInvalidate();
           navigate(`/chat/${room.id}`);
           return true;
         } catch (err: unknown) {
