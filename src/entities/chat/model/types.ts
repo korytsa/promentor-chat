@@ -10,6 +10,7 @@ export type ChatSearchOption = {
   id: string;
   name: string;
   avatarUrl: string;
+  conversationCategory?: "direct" | "group";
   isUserOnly?: boolean;
 };
 

@@ -42,7 +42,27 @@ function toSearchOptions(conversations: Conversation[]): ChatSearchOption[] {
     id: c.id,
     name: c.title,
     avatarUrl: c.avatarUrls[0] ?? "",
+    conversationCategory: c.category,
   }));
+}
+
+function isSamePersonAsDirectRoom(localRoom: ChatSearchOption, remote: ChatSearchOption): boolean {
+  if (localRoom.conversationCategory !== "direct") {
+    return false;
+  }
+  if (localRoom.name.trim().toLowerCase() !== remote.name.trim().toLowerCase()) {
+    return false;
+  }
+  return (localRoom.avatarUrl ?? "") === (remote.avatarUrl ?? "");
+}
+
+function withoutRemoteDuplicatesAgainstDirectRooms(
+  remoteOptions: ChatSearchOption[],
+  localRoomOptions: ChatSearchOption[],
+): ChatSearchOption[] {
+  return remoteOptions.filter(
+    (remote) => !localRoomOptions.some((local) => isSamePersonAsDirectRoom(local, remote)),
+  );
 }
 
 type UseChatSidebarModelOptions = {
@@ -153,10 +173,12 @@ export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
   const filteredUsers = useMemo(() => {
     const localMatches = searchOptions.filter((u) => u.name.toLowerCase().includes(q));
     if (userSearchActive) {
-      return [...localMatches, ...remoteUserOptions];
+      const remotes = withoutRemoteDuplicatesAgainstDirectRooms(remoteUserOptions, localMatches);
+      return [...localMatches, ...remotes];
     }
     if (directoryEnabled && directoryOptions.length > 0) {
-      return [...directoryOptions, ...localMatches];
+      const directoryDeduped = withoutRemoteDuplicatesAgainstDirectRooms(directoryOptions, localMatches);
+      return [...directoryDeduped, ...localMatches];
     }
     return localMatches;
   }, [
