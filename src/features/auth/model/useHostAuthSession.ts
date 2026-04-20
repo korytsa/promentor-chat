@@ -53,8 +53,7 @@ async function loadFallbackSession(): Promise<LoadFallbackResult> {
       }
 
       const canRetry =
-        attempt < STANDALONE_AUTH_MAX_ATTEMPTS - 1 &&
-        isRetryableStandaloneAuthError(error);
+        attempt < STANDALONE_AUTH_MAX_ATTEMPTS - 1 && isRetryableStandaloneAuthError(error);
       if (canRetry) {
         await new Promise((resolve) =>
           setTimeout(resolve, getStandaloneAuthRetryDelayMs(error, attempt)),

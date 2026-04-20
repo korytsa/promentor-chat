@@ -67,9 +67,7 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function normalizeCurrentUser(
-  user: CurrentUser | null | undefined,
-): CurrentUser | null {
+export function normalizeCurrentUser(user: CurrentUser | null | undefined): CurrentUser | null {
   if (!user || !isNonEmptyString(user.id) || !isNonEmptyString(user.email)) {
     return null;
   }
