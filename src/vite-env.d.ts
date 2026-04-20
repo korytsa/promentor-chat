@@ -8,6 +8,7 @@ declare module "shell/authBridge" {
     email: string;
     fullName: string;
     role: AuthRole;
+    avatarUrl?: string | null;
   };
 
   export type AuthSession = {
