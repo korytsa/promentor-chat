@@ -260,6 +260,15 @@ export function useChatRoomMessages(
       setRemote((prev) =>
         patchReadyForRoom(roomId, prev, (items) => mergeMessageList(items, optimistic)),
       );
+      if (messagesScrollRef?.current) {
+        requestAnimationFrame(() => {
+          const el = messagesScrollRef.current;
+          if (!el) {
+            return;
+          }
+          el.scrollTop = el.scrollHeight;
+        });
+      }
 
       setIsSending(true);
       try {
@@ -293,7 +302,7 @@ export function useChatRoomMessages(
         setIsSending(false);
       }
     },
-    [roomId, session.user?.fullName],
+    [roomId, session.user?.fullName, messagesScrollRef],
   );
 
   const isLoading = roomId !== undefined && (!remote || remote.roomId !== roomId);
