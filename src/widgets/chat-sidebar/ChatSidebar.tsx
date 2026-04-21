@@ -10,7 +10,7 @@ type ChatSidebarProps = {
 };
 
 export default function ChatSidebar({ className }: ChatSidebarProps) {
-  const { session, isBridgeAvailable, isHydrating } = useHostAuthSession();
+  const { session } = useHostAuthSession();
   const {
     search,
     directMessages,
@@ -21,19 +21,6 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
     status: roomsStatus,
   } = useChatSidebarModel({ excludeUserId: session.user?.id });
 
-  const sessionLabel = (() => {
-    if (isHydrating) {
-      return "Loading session…";
-    }
-    if (!isBridgeAvailable) {
-      return "Auth bridge unavailable";
-    }
-    if (session.isAuthenticated && session.user) {
-      return session.user.fullName;
-    }
-    return "Not signed in";
-  })();
-
   return (
     <div
       className={[
@@ -41,24 +28,6 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
         className ?? "",
       ].join(" ")}
     >
-      <div className="rounded-lg border border-white/15 bg-white/5 px-3 py-2">
-        <Typography component="p" variantStyle="caption" className="text-white/50">
-          Signed in as
-        </Typography>
-        <Typography component="p" variantStyle="subtitle" className="truncate text-sm">
-          {sessionLabel}
-        </Typography>
-        {session.user ? (
-          <Typography
-            component="p"
-            variantStyle="caption"
-            className="mt-0.5 truncate text-white/45"
-          >
-            {session.user.email}
-          </Typography>
-        ) : null}
-      </div>
-
       <div className={["flex flex-col gap-5", visibilityClassName].join(" ")}>
         <GlobalChatSearch
           query={search.query}

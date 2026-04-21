@@ -1,5 +1,5 @@
 import type { ChatSearchOption } from "./types";
-import type { SearchUser } from "./fixtures";
+import type { SearchUser } from "./types";
 import type { AuthUserResponseDto, UserSearchResultDto } from "../../../shared/api/types/user";
 
 export function mapAuthUserToChatOption(u: AuthUserResponseDto): ChatSearchOption {

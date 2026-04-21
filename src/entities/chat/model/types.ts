@@ -14,6 +14,13 @@ export type ChatSearchOption = {
   isUserOnly?: boolean;
 };
 
+export type SearchUser = {
+  id: string;
+  name: string;
+  avatarUrl: string;
+  chatId?: string;
+};
+
 export type MessageRole = "assistant" | "user";
 
 export type ChatRoomMessageView = {
