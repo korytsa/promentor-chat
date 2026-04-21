@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchRoomById, parseApiFailure } from "../../../shared/api";
+import { ApiError, fetchRoomById, parseApiFailure } from "../../../shared/api";
 import type { Conversation } from "../../../entities/chat";
 import { mapRoomListItemToConversation } from "../../../entities/chat/model/mapRoomListItem";
+import { CHAT_ROOMS_INVALIDATE_EVENT } from "../../../shared/lib/chatRoomsInvalidate";
+import { getOrCreateChatSocket } from "../../../shared/lib/chatSocket";
+import { CHAT_SOCKET_EVENTS } from "../../../shared/lib/chatSocketEvents";
 
 export type ChatPageReadyViewModel = {
   activeConversation: Conversation;
@@ -24,6 +27,36 @@ export function useChatPage(): ChatPageState {
   const { chatId } = useParams();
   const navigate = useNavigate();
   const [remote, setRemote] = useState<RemoteState | null>(null);
+  const [roomsInvalidateNonce, setRoomsInvalidateNonce] = useState(0);
+
+  useEffect(() => {
+    const onInvalidate = () => {
+      setRoomsInvalidateNonce((n) => n + 1);
+    };
+    window.addEventListener(CHAT_ROOMS_INVALIDATE_EVENT, onInvalidate);
+    return () => window.removeEventListener(CHAT_ROOMS_INVALIDATE_EVENT, onInvalidate);
+  }, []);
+
+  useEffect(() => {
+    const socket = getOrCreateChatSocket();
+    if (!socket || !chatId) {
+      return;
+    }
+    const onRoomsChanged = (raw: unknown) => {
+      if (!raw || typeof raw !== "object") {
+        return;
+      }
+      const payload = raw as { roomId?: unknown };
+      if (payload.roomId !== chatId) {
+        return;
+      }
+      setRoomsInvalidateNonce((n) => n + 1);
+    };
+    socket.on(CHAT_SOCKET_EVENTS.roomsChanged, onRoomsChanged);
+    return () => {
+      socket.off(CHAT_SOCKET_EVENTS.roomsChanged, onRoomsChanged);
+    };
+  }, [chatId]);
 
   useEffect(() => {
     if (!chatId) {
@@ -61,6 +94,10 @@ export function useChatPage(): ChatPageState {
         if (cancelled) {
           return;
         }
+        if (err instanceof ApiError && err.status === 404) {
+          navigate("/chat", { replace: true });
+          return;
+        }
         setRemote({
           chatId,
           kind: "error",
@@ -75,7 +112,7 @@ export function useChatPage(): ChatPageState {
     return () => {
       cancelled = true;
     };
-  }, [chatId]);
+  }, [chatId, roomsInvalidateNonce, navigate]);
 
   if (!chatId) {
     return { status: "empty" };

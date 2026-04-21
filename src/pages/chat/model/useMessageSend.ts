@@ -60,12 +60,24 @@ export function useMessageSend({
           });
           void markRoomRead(roomId, { messageId: created.id }).catch(() => {});
         } else {
-          const { items, pagination } = await loadInitialRoomMessages(roomId);
-          setRemote({
-            roomId,
-            kind: "ready",
-            items,
-            pagination,
+          const { items: latestItems, pagination } = await loadInitialRoomMessages(roomId);
+          setRemote((prev) => {
+            if (!prev || prev.roomId !== roomId || prev.kind !== "ready") {
+              return prev;
+            }
+            const merged = latestItems.reduce<ChatRoomMessageView[]>(
+              (acc, item) => mergeMessageList(acc, item),
+              prev.items,
+            );
+            return {
+              roomId,
+              kind: "ready",
+              items: merged,
+              pagination: {
+                total: pagination.total,
+                oldestLoadedOffset: prev.pagination.oldestLoadedOffset,
+              },
+            };
           });
         }
       } catch (err: unknown) {
