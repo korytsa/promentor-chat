@@ -20,9 +20,7 @@ describe("mapMessageDto helpers", () => {
       .spyOn(globalThis.crypto, "randomUUID")
       .mockReturnValue("123e4567-e89b-12d3-a456-426614174000");
     const message = buildOptimisticOwnMessage("hello", "You");
-    expect(message.id).toBe(
-      `${OPTIMISTIC_MESSAGE_ID_PREFIX}123e4567-e89b-12d3-a456-426614174000`,
-    );
+    expect(message.id).toBe(`${OPTIMISTIC_MESSAGE_ID_PREFIX}123e4567-e89b-12d3-a456-426614174000`);
     uuidSpy.mockRestore();
   });
 
