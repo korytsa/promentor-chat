@@ -24,8 +24,24 @@ describe("mapMessageDto helpers", () => {
 
   it("deduplicates by id in mergeMessageList and keeps chronology", () => {
     const merged = mergeMessageList(
-      [{ id: "m2", createdAt: "2025-01-02T00:00:00.000Z", text: "", timeLabel: "", authorName: "", isOwn: false }],
-      { id: "m1", createdAt: "2025-01-01T00:00:00.000Z", text: "", timeLabel: "", authorName: "", isOwn: false },
+      [
+        {
+          id: "m2",
+          createdAt: "2025-01-02T00:00:00.000Z",
+          text: "",
+          timeLabel: "",
+          authorName: "",
+          isOwn: false,
+        },
+      ],
+      {
+        id: "m1",
+        createdAt: "2025-01-01T00:00:00.000Z",
+        text: "",
+        timeLabel: "",
+        authorName: "",
+        isOwn: false,
+      },
     );
     expect(merged.map((m) => m.id)).toEqual(["m1", "m2"]);
     expect(latestServerMessageId(merged)).toBe("m2");

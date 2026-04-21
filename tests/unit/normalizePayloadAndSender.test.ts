@@ -35,5 +35,4 @@ describe("normalizeSender", () => {
     const result = normalizeSender({ sender: { id: 99, name: "Kate", avatarUrl: null } });
     expect(result).toEqual({ id: "99", fullName: "Kate", avatarUrl: null });
   });
-
 });

@@ -39,7 +39,12 @@ describe("sidebarSearchUtils", () => {
       avatarUrl: "a.png",
       conversationCategory: "direct",
     };
-    const remote: ChatSearchOption = { id: "u1", name: "john doe", avatarUrl: "a.png", isUserOnly: true };
+    const remote: ChatSearchOption = {
+      id: "u1",
+      name: "john doe",
+      avatarUrl: "a.png",
+      isUserOnly: true,
+    };
 
     expect(isSamePersonAsDirectRoom(local, remote)).toBe(true);
   });

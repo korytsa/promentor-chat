@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { appendIncomingDto, mergeInitialWithBufferedIncoming } from "../../src/pages/chat/model/chatRoomMessageUtils";
+import {
+  appendIncomingDto,
+  mergeInitialWithBufferedIncoming,
+} from "../../src/pages/chat/model/chatRoomMessageUtils";
 import { patchReadyForRoom } from "../../src/pages/chat/model/remoteMessagesPatch";
 import { OPTIMISTIC_MESSAGE_ID_PREFIX } from "../../src/entities/chat/model/mapMessageDto";
 
@@ -90,7 +93,10 @@ describe("remoteMessagesPatch", () => {
         items: [],
         pagination: { total: 0, oldestLoadedOffset: 0 },
       },
-      (items) => [...items, { id: "m1", createdAt: "", text: "", timeLabel: "", authorName: "", isOwn: false }],
+      (items) => [
+        ...items,
+        { id: "m1", createdAt: "", text: "", timeLabel: "", authorName: "", isOwn: false },
+      ],
     );
     expect(updated?.kind).toBe("ready");
     if (updated?.kind !== "ready") {
