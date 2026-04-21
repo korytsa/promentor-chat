@@ -70,7 +70,11 @@ export default function ChatPage() {
     });
   }, [hasMoreOlder, loadingOlder, loadOlder, onMessagesScrollForReadReceipt]);
 
-  const { leave, busy: leaveBusy, error: leaveError } = useLeaveRoom(
+  const {
+    leave,
+    busy: leaveBusy,
+    error: leaveError,
+  } = useLeaveRoom(
     chatId,
     pageState.status === "ready" ? pageState.viewModel.activeConversation.category : undefined,
   );
@@ -109,9 +113,7 @@ export default function ChatPage() {
       : CHAT_PAGE_COPY.leaveGroup;
   const headerAvatars = activeConversation.avatarUrls.slice(0, 3);
   const overflowCount =
-    activeConversation.avatarUrls.length > 3
-      ? activeConversation.avatarUrls.length - 3
-      : 0;
+    activeConversation.avatarUrls.length > 3 ? activeConversation.avatarUrls.length - 3 : 0;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden sm:rounded-lg sm:border border-white/20">
@@ -133,10 +135,7 @@ export default function ChatPage() {
                   </div>
                 ))
               ) : (
-                <Avatar
-                  user={{ name: activeConversation.title }}
-                  size="sm"
-                />
+                <Avatar user={{ name: activeConversation.title }} size="sm" />
               )}
               {overflowCount > 0 ? (
                 <Typography
@@ -171,7 +170,11 @@ export default function ChatPage() {
               {leaveLabel}
             </Button>
             {leaveError ? (
-              <Typography component="p" variantStyle="caption" className="max-w-[12rem] text-right text-red-200/90">
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="max-w-[12rem] text-right text-red-200/90"
+              >
                 {leaveError}
               </Typography>
             ) : null}
@@ -188,7 +191,11 @@ export default function ChatPage() {
           </div>
         ) : messagesError ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 px-4 py-8">
-            <Typography component="p" variantStyle="caption" className="text-center text-red-200/90">
+            <Typography
+              component="p"
+              variantStyle="caption"
+              className="text-center text-red-200/90"
+            >
               {messagesError}
             </Typography>
           </div>
@@ -199,33 +206,51 @@ export default function ChatPage() {
             className="hide-scrollbar h-full space-y-4 overflow-y-auto px-4 py-5"
           >
             {socketConnectionError ? (
-              <Typography component="p" variantStyle="caption" className="mb-2 text-center text-amber-200/90">
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="mb-2 text-center text-amber-200/90"
+              >
                 {socketConnectionError}
               </Typography>
             ) : null}
             {socketRoomError ? (
-              <Typography component="p" variantStyle="caption" className="mb-2 text-center text-red-200/90">
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="mb-2 text-center text-red-200/90"
+              >
                 {socketRoomError}
               </Typography>
             ) : null}
             {loadOlderError ? (
-              <Typography component="p" variantStyle="caption" className="mb-2 text-center text-red-200/90">
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="mb-2 text-center text-red-200/90"
+              >
                 {loadOlderError}
               </Typography>
             ) : null}
             {loadingOlder ? (
-              <Typography component="p" variantStyle="caption" className="mb-2 text-center text-white/45">
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="mb-2 text-center text-white/45"
+              >
                 Loading older messages…
               </Typography>
             ) : null}
             {messages.length === 0 ? (
-              <Typography component="p" variantStyle="caption" className="text-center text-white/50">
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="text-center text-white/50"
+              >
                 No messages yet. Say hello.
               </Typography>
             ) : (
-              messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
-              ))
+              messages.map((message) => <MessageBubble key={message.id} message={message} />)
             )}
           </div>
         )}

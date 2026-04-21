@@ -3,13 +3,7 @@ export { ApiError } from "./error";
 export { parseApiFailure } from "./parseApiFailure";
 export type { ParseApiFailureOptions } from "./parseApiFailure";
 export { apiFetch, apiJson } from "./client";
-export {
-  createRoom,
-  fetchRoomById,
-  fetchRooms,
-  removeSelfFromRoom,
-  roomsBasePath,
-} from "./rooms";
+export { createRoom, fetchRoomById, fetchRooms, removeSelfFromRoom, roomsBasePath } from "./rooms";
 export { fetchAuthMe, authBasePath } from "./auth";
 export { fetchUsers, searchUsers, usersBasePath } from "./users";
 export { fetchRoomMessages, markRoomRead, sendRoomMessage } from "./messages";

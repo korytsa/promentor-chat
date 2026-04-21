@@ -4,14 +4,22 @@ import { fetchRoomMessages, markRoomRead, parseApiFailure } from "../../../share
 import type { MessageDto } from "../../../shared/api/types/message";
 import type { ChatRoomMessageView } from "../../../entities/chat";
 import { latestServerMessageId } from "../../../entities/chat/model/mapMessageDto";
-import { CHAT_MESSAGE_PAGE_SIZE, CHAT_ROOM_LOAD_MESSAGES_FAILURE, CHAT_ROOM_LOAD_OLDER_FAILURE } from "./constants";
+import {
+  CHAT_MESSAGE_PAGE_SIZE,
+  CHAT_ROOM_LOAD_MESSAGES_FAILURE,
+  CHAT_ROOM_LOAD_OLDER_FAILURE,
+} from "./constants";
 import {
   appendIncomingDto,
   loadInitialRoomMessages,
   mergeInitialWithBufferedIncoming,
   mergeOlderMessagesPage,
 } from "./chatRoomMessageUtils";
-import { patchReadyForRoom, type MessagesPaginationState, type RemoteMessages } from "./remoteMessagesPatch";
+import {
+  patchReadyForRoom,
+  type MessagesPaginationState,
+  type RemoteMessages,
+} from "./remoteMessagesPatch";
 
 type Params = {
   roomId: string | undefined;
@@ -19,11 +27,7 @@ type Params = {
   messagesScrollRef?: RefObject<HTMLDivElement | null>;
 };
 
-export function useMessagePagination({
-  roomId,
-  sessionUserId,
-  messagesScrollRef,
-}: Params) {
+export function useMessagePagination({ roomId, sessionUserId, messagesScrollRef }: Params) {
   const [remote, setRemote] = useState<RemoteMessages | null>(null);
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [loadOlderError, setLoadOlderError] = useState<string | null>(null);
@@ -50,7 +54,12 @@ export function useMessagePagination({
   }, [roomId]);
 
   useEffect(() => {
-    if (roomId !== undefined && remote !== null && remote.roomId === roomId && remote.kind === "ready") {
+    if (
+      roomId !== undefined &&
+      remote !== null &&
+      remote.roomId === roomId &&
+      remote.kind === "ready"
+    ) {
       itemsRef.current = remote.items;
     } else {
       itemsRef.current = [];

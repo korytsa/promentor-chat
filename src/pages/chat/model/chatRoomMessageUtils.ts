@@ -95,7 +95,10 @@ export function mergeInitialWithBufferedIncoming(
           roomId,
           kind: "ready",
           items: acc,
-          pagination: { total: pagination.total, oldestLoadedOffset: pagination.oldestLoadedOffset },
+          pagination: {
+            total: pagination.total,
+            oldestLoadedOffset: pagination.oldestLoadedOffset,
+          },
         },
         {
           ...dto,

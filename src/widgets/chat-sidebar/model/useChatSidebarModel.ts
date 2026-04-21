@@ -14,7 +14,9 @@ export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
   const location = useLocation();
   const { status, errorMessage, directMessages, groupMessages, conversations } = useRoomsList();
   const searchState = useGlobalUserSearch({ conversations, excludeUserId });
-  const { onSelectSearchOption } = useDmOpenOrCreate({ setDmCreateError: searchState.setDmCreateError });
+  const { onSelectSearchOption } = useDmOpenOrCreate({
+    setDmCreateError: searchState.setDmCreateError,
+  });
   const { containerRef, setIsOpen } = searchState;
 
   const isListRoute = location.pathname === "/" || location.pathname === "/chat";

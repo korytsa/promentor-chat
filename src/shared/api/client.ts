@@ -35,7 +35,11 @@ async function tryRefreshSession(): Promise<boolean> {
   }
 }
 
-async function apiFetchOnce(url: string | URL, init: RequestInit, retried: boolean): Promise<Response> {
+async function apiFetchOnce(
+  url: string | URL,
+  init: RequestInit,
+  retried: boolean,
+): Promise<Response> {
   const response = await fetch(url, init);
   if (response.ok) {
     return response;

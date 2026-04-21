@@ -51,7 +51,12 @@ export function useCreateGroupPage(): CreateGroupPageViewModel {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const selectorRef = useRef<HTMLDivElement | null>(null);
 
-  const { dtos, loading: searchLoading, error: searchError, active: searchActive } = useUserSearch({
+  const {
+    dtos,
+    loading: searchLoading,
+    error: searchError,
+    active: searchActive,
+  } = useUserSearch({
     debouncedQuery,
     minQueryLength: 1,
     parseFailure: CREATE_GROUP_SEARCH_FAILURE,

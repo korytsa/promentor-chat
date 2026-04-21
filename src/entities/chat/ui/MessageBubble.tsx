@@ -8,9 +8,7 @@ type MessageBubbleProps = {
 export function MessageBubble({ message }: MessageBubbleProps) {
   if (message.isOwn) {
     return (
-      <div
-        className={`ml-auto max-w-[70%]${message.pending ? " opacity-80" : ""}`}
-      >
+      <div className={`ml-auto max-w-[70%]${message.pending ? " opacity-80" : ""}`}>
         <div className="mb-1 flex items-baseline justify-end gap-2">
           <Typography component="span" className="text-xs">
             {message.timeLabel}

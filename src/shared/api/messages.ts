@@ -22,14 +22,11 @@ export async function sendRoomMessage(
   roomId: string,
   body: { message: string },
 ): Promise<MessageDto | null> {
-  const response = await apiFetch(
-    `${roomsBasePath()}/${encodeURIComponent(roomId)}/messages`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    },
-  );
+  const response = await apiFetch(`${roomsBasePath()}/${encodeURIComponent(roomId)}/messages`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
   const text = await response.text();
   if (!text.trim()) {
     return null;
@@ -41,10 +38,7 @@ export type MarkRoomReadBody = {
   messageId?: string;
 };
 
-export async function markRoomRead(
-  roomId: string,
-  body: MarkRoomReadBody = {},
-): Promise<void> {
+export async function markRoomRead(roomId: string, body: MarkRoomReadBody = {}): Promise<void> {
   await apiFetch(`${roomsBasePath()}/${encodeURIComponent(roomId)}/read`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

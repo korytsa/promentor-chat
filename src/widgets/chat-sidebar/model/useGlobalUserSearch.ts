@@ -1,11 +1,17 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { Conversation } from "../../../entities/chat";
-import { mapAuthUserToChatOption, mapUserSearchDtoToChatOption } from "../../../entities/chat/model/mapUserSearchDto";
+import {
+  mapAuthUserToChatOption,
+  mapUserSearchDtoToChatOption,
+} from "../../../entities/chat/model/mapUserSearchDto";
 import {
   CHAT_SIDEBAR_USERS_DIRECTORY_FAILURE,
   CHAT_SIDEBAR_USER_SEARCH_FAILURE,
 } from "../../../pages/chat/model/constants";
-import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
+import {
+  USER_SEARCH_DEBOUNCE_MS,
+  USER_SEARCH_MIN_QUERY_LEN,
+} from "../../../shared/lib/constants/userSearch";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
 import { useUserSearch } from "../../../shared/lib/useUserSearch";
 import { useUsersDirectory } from "../../../shared/lib/useUsersDirectory";
@@ -28,13 +34,17 @@ export function useGlobalUserSearch({ conversations, excludeUserId }: Params) {
     setQueryState(value);
   }, []);
 
-  const { dtos, loading: userSearchLoading, error: userSearchError, active: userSearchActive } =
-    useUserSearch({
-      debouncedQuery,
-      minQueryLength: USER_SEARCH_MIN_QUERY_LEN,
-      parseFailure: CHAT_SIDEBAR_USER_SEARCH_FAILURE,
-      excludeUserId,
-    });
+  const {
+    dtos,
+    loading: userSearchLoading,
+    error: userSearchError,
+    active: userSearchActive,
+  } = useUserSearch({
+    debouncedQuery,
+    minQueryLength: USER_SEARCH_MIN_QUERY_LEN,
+    parseFailure: CHAT_SIDEBAR_USER_SEARCH_FAILURE,
+    excludeUserId,
+  });
 
   const directoryEnabled = isOpen && query.trim().length < USER_SEARCH_MIN_QUERY_LEN;
   const {
@@ -65,7 +75,10 @@ export function useGlobalUserSearch({ conversations, excludeUserId }: Params) {
       return [...localMatches, ...remotes];
     }
     if (directoryEnabled && directoryOptions.length > 0) {
-      const directoryDeduped = withoutRemoteDuplicatesAgainstDirectRooms(directoryOptions, localMatches);
+      const directoryDeduped = withoutRemoteDuplicatesAgainstDirectRooms(
+        directoryOptions,
+        localMatches,
+      );
       return [...directoryDeduped, ...localMatches];
     }
     return localMatches;

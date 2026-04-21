@@ -2,7 +2,11 @@ import { useCallback, useState } from "react";
 import { markRoomRead, parseApiFailure, sendRoomMessage } from "../../../shared/api";
 import type { MessageDto } from "../../../shared/api/types/message";
 import type { ChatRoomMessageView } from "../../../entities/chat";
-import { buildOptimisticOwnMessage, mapMessageDtoToView, mergeMessageList } from "../../../entities/chat/model/mapMessageDto";
+import {
+  buildOptimisticOwnMessage,
+  mapMessageDtoToView,
+  mergeMessageList,
+} from "../../../entities/chat/model/mapMessageDto";
 import { CHAT_ROOM_SEND_MESSAGE_FAILURE } from "./constants";
 import { loadInitialRoomMessages } from "./chatRoomMessageUtils";
 import type { RemoteMessages } from "./remoteMessagesPatch";

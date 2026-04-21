@@ -1,7 +1,10 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ChatSearchOption, Conversation } from "../../../entities/chat";
-import { mapRoomListItemToConversation, sortRoomsByUpdatedAtDesc } from "../../../entities/chat/model/mapRoomListItem";
+import {
+  mapRoomListItemToConversation,
+  sortRoomsByUpdatedAtDesc,
+} from "../../../entities/chat/model/mapRoomListItem";
 import { ApiError, createRoom, fetchRooms, parseApiFailure } from "../../../shared/api";
 import { dispatchChatRoomsInvalidate } from "../../../shared/lib/chatRoomsInvalidate";
 import { CHAT_SEARCH_DM_FAILURE } from "../../../pages/chat/model/constants";
@@ -11,9 +14,13 @@ type Params = {
   setDmCreateError: (message: string | null) => void;
 };
 
-async function findExistingDirectConversation(option: ChatSearchOption): Promise<Conversation | null> {
+async function findExistingDirectConversation(
+  option: ChatSearchOption,
+): Promise<Conversation | null> {
   const rooms = await fetchRooms();
-  const conversations: Conversation[] = sortRoomsByUpdatedAtDesc(rooms).map(mapRoomListItemToConversation);
+  const conversations: Conversation[] = sortRoomsByUpdatedAtDesc(rooms).map(
+    mapRoomListItemToConversation,
+  );
   const existingDm = conversations.find((c) =>
     isSamePersonAsDirectRoom(
       {

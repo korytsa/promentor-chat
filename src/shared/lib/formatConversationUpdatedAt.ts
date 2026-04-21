@@ -5,8 +5,7 @@ export function formatConversationUpdatedAt(iso: string): string {
   }
 
   const now = new Date();
-  const dayStart = (d: Date) =>
-    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 
   const diffMs = now.getTime() - date.getTime();
   const diffMinutes = Math.floor(diffMs / 60_000);

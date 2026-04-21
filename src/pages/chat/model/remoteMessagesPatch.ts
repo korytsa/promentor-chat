@@ -6,7 +6,12 @@ export type MessagesPaginationState = {
 };
 
 export type RemoteMessages =
-  | { roomId: string; kind: "ready"; items: ChatRoomMessageView[]; pagination: MessagesPaginationState }
+  | {
+      roomId: string;
+      kind: "ready";
+      items: ChatRoomMessageView[];
+      pagination: MessagesPaginationState;
+    }
   | { roomId: string; kind: "error"; message: string };
 
 export function patchReadyForRoom(

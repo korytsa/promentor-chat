@@ -22,7 +22,10 @@ export function toSearchOptions(conversations: Conversation[]): ChatSearchOption
   }));
 }
 
-export function isSamePersonAsDirectRoom(localRoom: ChatSearchOption, remote: ChatSearchOption): boolean {
+export function isSamePersonAsDirectRoom(
+  localRoom: ChatSearchOption,
+  remote: ChatSearchOption,
+): boolean {
   if (localRoom.conversationCategory !== "direct") {
     return false;
   }

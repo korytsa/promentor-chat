@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Conversation } from "../../../entities/chat";
-import { mapRoomListItemToConversation, sortRoomsByUpdatedAtDesc } from "../../../entities/chat/model/mapRoomListItem";
+import {
+  mapRoomListItemToConversation,
+  sortRoomsByUpdatedAtDesc,
+} from "../../../entities/chat/model/mapRoomListItem";
 import { fetchRooms, parseApiFailure } from "../../../shared/api";
 import { CHAT_ROOMS_INVALIDATE_EVENT } from "../../../shared/lib/chatRoomsInvalidate";
 import { getOrCreateChatSocket } from "../../../shared/lib/chatSocket";

@@ -1,4 +1,3 @@
-
 export function getChatSocketUrl(): string | null {
   const explicit = import.meta.env.VITE_CHAT_SOCKET_URL;
   if (typeof explicit === "string" && explicit.trim()) {

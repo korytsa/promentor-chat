@@ -127,7 +127,10 @@ function MembersSelector({ state }: MembersSelectorProps) {
                   />
                 ))
               : null}
-            {!searchLoading && !searchError && filteredMembers.length === 0 && query.trim().length > 0 ? (
+            {!searchLoading &&
+            !searchError &&
+            filteredMembers.length === 0 &&
+            query.trim().length > 0 ? (
               <Typography component="p" variantStyle="caption" className="px-1 py-2">
                 No users match your search.
               </Typography>

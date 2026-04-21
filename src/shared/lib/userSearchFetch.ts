@@ -29,7 +29,6 @@ export function isAbortError(err: unknown): boolean {
   );
 }
 
-
 export async function searchUsersWith429Retry(
   q: string,
   limit: number,

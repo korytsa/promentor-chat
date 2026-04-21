@@ -25,14 +25,7 @@ export function parseMessageDtoFromSocket(raw: unknown): MessageDto | null {
       ? clientMessageIdRaw
       : undefined;
 
-  if (
-    !id ||
-    !roomId ||
-    !senderId ||
-    !messageText ||
-    !createdAt ||
-    !sender
-  ) {
+  if (!id || !roomId || !senderId || !messageText || !createdAt || !sender) {
     return null;
   }
 

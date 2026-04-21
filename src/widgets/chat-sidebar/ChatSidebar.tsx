@@ -49,15 +49,17 @@ export default function ChatSidebar({ className }: ChatSidebarProps) {
           {sessionLabel}
         </Typography>
         {session.user ? (
-          <Typography component="p" variantStyle="caption" className="mt-0.5 truncate text-white/45">
+          <Typography
+            component="p"
+            variantStyle="caption"
+            className="mt-0.5 truncate text-white/45"
+          >
             {session.user.email}
           </Typography>
         ) : null}
       </div>
 
-      <div
-        className={["flex flex-col gap-5", visibilityClassName].join(" ")}
-      >
+      <div className={["flex flex-col gap-5", visibilityClassName].join(" ")}>
         <GlobalChatSearch
           query={search.query}
           setQuery={search.setQuery}
