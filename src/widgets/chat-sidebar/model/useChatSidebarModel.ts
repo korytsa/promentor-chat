@@ -1,74 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { ApiError, createRoom, fetchRooms, parseApiFailure } from "../../../shared/api";
-import type { ChatSearchOption, Conversation } from "../../../entities/chat";
-import {
-  mapRoomListItemToConversation,
-  sortRoomsByUpdatedAtDesc,
-} from "../../../entities/chat/model/mapRoomListItem";
-import {
-  mapAuthUserToChatOption,
-  mapUserSearchDtoToChatOption,
-} from "../../../entities/chat/model/mapUserSearchDto";
-import {
-  CHAT_SEARCH_DM_FAILURE,
-  CHAT_SIDEBAR_USERS_DIRECTORY_FAILURE,
-  CHAT_SIDEBAR_USER_SEARCH_FAILURE,
-} from "../../../pages/chat/model/constants";
-import {
-  CHAT_ROOMS_INVALIDATE_EVENT,
-  dispatchChatRoomsInvalidate,
-} from "../../../shared/lib/chatRoomsInvalidate";
-import { getOrCreateChatSocket } from "../../../shared/lib/chatSocket";
-import { CHAT_SOCKET_EVENTS } from "../../../shared/lib/chatSocketEvents";
-import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
-import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
-import { useUserSearch } from "../../../shared/lib/useUserSearch";
-import { useUsersDirectory } from "../../../shared/lib/useUsersDirectory";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { SIDEBAR_CONVERSATION_CATEGORY_CLASS } from "./constants";
-
-type LoadStatus = "loading" | "ready" | "error";
-
-function partitionConversations(conversations: Conversation[]) {
-  const directMessages: Conversation[] = [];
-  const groupMessages: Conversation[] = [];
-  for (const c of conversations) {
-    if (c.category === "direct") {
-      directMessages.push(c);
-    } else {
-      groupMessages.push(c);
-    }
-  }
-  return { directMessages, groupMessages };
-}
-
-function toSearchOptions(conversations: Conversation[]): ChatSearchOption[] {
-  return conversations.map((c) => ({
-    id: c.id,
-    name: c.title,
-    avatarUrl: c.avatarUrls[0] ?? "",
-    conversationCategory: c.category,
-  }));
-}
-
-function isSamePersonAsDirectRoom(localRoom: ChatSearchOption, remote: ChatSearchOption): boolean {
-  if (localRoom.conversationCategory !== "direct") {
-    return false;
-  }
-  if (localRoom.name.trim().toLowerCase() !== remote.name.trim().toLowerCase()) {
-    return false;
-  }
-  return (localRoom.avatarUrl ?? "") === (remote.avatarUrl ?? "");
-}
-
-function withoutRemoteDuplicatesAgainstDirectRooms(
-  remoteOptions: ChatSearchOption[],
-  localRoomOptions: ChatSearchOption[],
-): ChatSearchOption[] {
-  return remoteOptions.filter(
-    (remote) => !localRoomOptions.some((local) => isSamePersonAsDirectRoom(local, remote)),
-  );
-}
+import { useDmOpenOrCreate } from "./useDmOpenOrCreate";
+import { useGlobalUserSearch } from "./useGlobalUserSearch";
+import { useRoomsList } from "./useRoomsList";
 
 type UseChatSidebarModelOptions = {
   excludeUserId?: string;
@@ -77,142 +12,10 @@ type UseChatSidebarModelOptions = {
 export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
   const excludeUserId = options?.excludeUserId;
   const location = useLocation();
-  const navigate = useNavigate();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [status, setStatus] = useState<LoadStatus>("loading");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [query, setQueryState] = useState("");
-  const debouncedQuery = useDebouncedValue(query, USER_SEARCH_DEBOUNCE_MS);
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const [dmCreateError, setDmCreateError] = useState<string | null>(null);
-  const [roomsRefetchNonce, setRoomsRefetchNonce] = useState(0);
-  const loadRooms = useCallback(
-    async (cancelledRef: { value: boolean }) => {
-      try {
-        const items = await fetchRooms();
-        if (cancelledRef.value) {
-          return;
-        }
-        const mapped = sortRoomsByUpdatedAtDesc(items).map(mapRoomListItemToConversation);
-        setConversations(mapped);
-        setErrorMessage(null);
-        setStatus("ready");
-      } catch (err: unknown) {
-        if (cancelledRef.value) {
-          return;
-        }
-        setConversations([]);
-        setErrorMessage(
-          parseApiFailure(err, {
-            fallback: "Could not load conversations.",
-            unauthorized: "Sign in to load conversations.",
-          }),
-        );
-        setStatus("error");
-      }
-    },
-    [],
-  );
-
-
-  const setQuery = useCallback((value: string) => {
-    setDmCreateError(null);
-    setQueryState(value);
-  }, []);
-
-  const { dtos, loading: userSearchLoading, error: userSearchError, active: userSearchActive } =
-    useUserSearch({
-      debouncedQuery,
-      minQueryLength: USER_SEARCH_MIN_QUERY_LEN,
-      parseFailure: CHAT_SIDEBAR_USER_SEARCH_FAILURE,
-      excludeUserId,
-    });
-
-  const directoryEnabled = isOpen && query.trim().length < USER_SEARCH_MIN_QUERY_LEN;
-
-  const {
-    items: directoryUsers,
-    loading: directoryLoading,
-    error: directoryError,
-  } = useUsersDirectory({
-    enabled: directoryEnabled,
-    excludeUserId,
-    parseFailure: CHAT_SIDEBAR_USERS_DIRECTORY_FAILURE,
-  });
-
-  const remoteUserOptions = useMemo(
-    () => (userSearchActive ? dtos.map(mapUserSearchDtoToChatOption) : []),
-    [userSearchActive, dtos],
-  );
-
-  const directoryOptions = useMemo(
-    () => directoryUsers.map(mapAuthUserToChatOption),
-    [directoryUsers],
-  );
-
-  useEffect(() => {
-    const onInvalidate = () => {
-      setRoomsRefetchNonce((n) => n + 1);
-    };
-    window.addEventListener(CHAT_ROOMS_INVALIDATE_EVENT, onInvalidate);
-    return () => window.removeEventListener(CHAT_ROOMS_INVALIDATE_EVENT, onInvalidate);
-  }, []);
-
-  useEffect(() => {
-    const socket = getOrCreateChatSocket();
-    if (!socket) {
-      return;
-    }
-    const onRoomsChanged = () => {
-      setRoomsRefetchNonce((n) => n + 1);
-    };
-    socket.on(CHAT_SOCKET_EVENTS.roomsChanged, onRoomsChanged);
-    return () => {
-      socket.off(CHAT_SOCKET_EVENTS.roomsChanged, onRoomsChanged);
-    };
-  }, []);
-
-  useEffect(() => {
-    const cancelledRef = { value: false };
-    void loadRooms(cancelledRef);
-
-    return () => {
-      cancelledRef.value = true;
-    };
-  }, [roomsRefetchNonce, loadRooms]);
-
-  const q = query.trim().toLowerCase();
-
-  const { directMessages, groupMessages, searchOptions } = useMemo(() => {
-    const { directMessages: d, groupMessages: g } = partitionConversations(conversations);
-    return {
-      directMessages: d,
-      groupMessages: g,
-      searchOptions: toSearchOptions([...d, ...g]),
-    };
-  }, [conversations]);
-
-  const filteredUsers = useMemo(() => {
-    const localMatches = searchOptions.filter((u) => u.name.toLowerCase().includes(q));
-    if (userSearchActive) {
-      const remotes = withoutRemoteDuplicatesAgainstDirectRooms(remoteUserOptions, localMatches);
-      return [...localMatches, ...remotes];
-    }
-    if (directoryEnabled && directoryOptions.length > 0) {
-      const directoryDeduped = withoutRemoteDuplicatesAgainstDirectRooms(directoryOptions, localMatches);
-      return [...directoryDeduped, ...localMatches];
-    }
-    return localMatches;
-  }, [
-    searchOptions,
-    q,
-    userSearchActive,
-    remoteUserOptions,
-    directoryEnabled,
-    directoryOptions,
-  ]);
+  const { status, errorMessage, directMessages, groupMessages, conversations } = useRoomsList();
+  const searchState = useGlobalUserSearch({ conversations, excludeUserId });
+  const { onSelectSearchOption } = useDmOpenOrCreate({ setDmCreateError: searchState.setDmCreateError });
+  const { containerRef, setIsOpen } = searchState;
 
   const isListRoute = location.pathname === "/" || location.pathname === "/chat";
   const visibilityClassName = isListRoute ? "flex md:flex" : "hidden md:flex";
@@ -226,66 +29,22 @@ export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
 
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, []);
-
-  const onSelectSearchOption = useCallback(
-    async (option: ChatSearchOption): Promise<boolean> => {
-      if (option.isUserOnly) {
-        try {
-          const room = await createRoom({ type: "private", memberIds: [option.id] });
-          dispatchChatRoomsInvalidate();
-          navigate(`/chat/${room.id}`);
-          return true;
-        } catch (err: unknown) {
-          if (err instanceof ApiError && err.status === 400) {
-            try {
-              const rooms = await fetchRooms();
-              const conversations = sortRoomsByUpdatedAtDesc(rooms).map(mapRoomListItemToConversation);
-              const existingDm = conversations.find((c) =>
-                isSamePersonAsDirectRoom(
-                  {
-                    id: c.id,
-                    name: c.title,
-                    avatarUrl: c.avatarUrls[0] ?? "",
-                    conversationCategory: c.category,
-                  },
-                  option,
-                ),
-              );
-              if (existingDm) {
-                dispatchChatRoomsInvalidate();
-                navigate(`/chat/${existingDm.id}`);
-                return true;
-              }
-            } catch {
-              // keep default DM create error handling below
-            }
-          }
-          setDmCreateError(parseApiFailure(err, CHAT_SEARCH_DM_FAILURE));
-          return false;
-        }
-      }
-
-      navigate(`/chat/${option.id}`);
-      return true;
-    },
-    [navigate],
-  );
+  }, [containerRef, setIsOpen]);
 
   return {
     search: {
-      query,
-      setQuery,
-      isOpen,
-      setIsOpen,
-      containerRef,
-      filteredUsers,
+      query: searchState.query,
+      setQuery: searchState.setQuery,
+      isOpen: searchState.isOpen,
+      setIsOpen: searchState.setIsOpen,
+      containerRef: searchState.containerRef,
+      filteredUsers: searchState.filteredUsers,
       onSelectSearchOption,
-      userSearchLoading,
-      userSearchError,
-      directoryLoading,
-      directoryError,
-      dmCreateError,
+      userSearchLoading: searchState.userSearchLoading,
+      userSearchError: searchState.userSearchError,
+      directoryLoading: searchState.directoryLoading,
+      directoryError: searchState.directoryError,
+      dmCreateError: searchState.dmCreateError,
     },
     directMessages,
     groupMessages,

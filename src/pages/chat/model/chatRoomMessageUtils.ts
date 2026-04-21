@@ -77,3 +77,31 @@ export function appendIncomingDto(prev: ReadyRemote, dto: MessageDto): ReadyRemo
     },
   };
 }
+
+export function mergeInitialWithBufferedIncoming(
+  roomId: string,
+  initialItems: ChatRoomMessageView[],
+  pagination: MessagesPaginationState,
+  bufferedForRoom: MessageDto[],
+  sessionUserId: string | undefined,
+): ChatRoomMessageView[] {
+  if (bufferedForRoom.length === 0) {
+    return initialItems;
+  }
+  return bufferedForRoom.reduce<ChatRoomMessageView[]>(
+    (acc, dto) =>
+      appendIncomingDto(
+        {
+          roomId,
+          kind: "ready",
+          items: acc,
+          pagination: { total: pagination.total, oldestLoadedOffset: pagination.oldestLoadedOffset },
+        },
+        {
+          ...dto,
+          isOwn: dto.senderId === sessionUserId,
+        },
+      ).items,
+    initialItems,
+  );
+}

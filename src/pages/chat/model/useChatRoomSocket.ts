@@ -4,6 +4,7 @@ import { useHostAuthSession } from "../../../features/auth";
 import { getOrCreateChatSocket } from "../../../shared/lib/chatSocket";
 import { CHAT_SOCKET_EVENTS } from "../../../shared/lib/chatSocketEvents";
 import { dispatchChatRoomsInvalidate } from "../../../shared/lib/chatRoomsInvalidate";
+import { CONNECTIVITY_MESSAGES } from "../../../shared/lib/connectivityMessages";
 import { parseMessageDtoFromSocket } from "../../../shared/lib/parseSocketMessageDto";
 import {
   parseChatRoomPresencePayload,
@@ -71,7 +72,7 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     };
 
     const onDisconnect = () => {
-      setSocketConnectionError("Connection lost. Reconnecting…");
+      setSocketConnectionError(CONNECTIVITY_MESSAGES.reconnecting);
     };
 
     const onNewMessage = (raw: unknown) => {
@@ -79,7 +80,6 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
       if (!dto) {
         return;
       }
-      // Keep sidebar rooms list in sync for recipients without page refresh.
       dispatchChatRoomsInvalidate();
       if (dto.roomId !== roomIdRef.current) {
         return;
@@ -138,7 +138,7 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
 
   useEffect(() => {
     const onOffline = () => {
-      setSocketConnectionError("No internet connection.");
+      setSocketConnectionError(CONNECTIVITY_MESSAGES.offline);
     };
     const onOnline = () => {
       setSocketConnectionError(null);
@@ -172,11 +172,11 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
         return false;
       }
       if (typeof navigator !== "undefined" && navigator.onLine === false) {
-        throw new Error("No internet connection.");
+        throw new Error(CONNECTIVITY_MESSAGES.offline);
       }
       const socket = getOrCreateChatSocket();
       if (!socket?.connected) {
-        throw new Error("Socket is not connected.");
+        throw new Error(CONNECTIVITY_MESSAGES.socketNotConnected);
       }
       socket.emit(CHAT_SOCKET_EVENTS.sendMessage, { roomId, message, clientMessageId });
       return true;

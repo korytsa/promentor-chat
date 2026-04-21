@@ -1,11 +1,12 @@
 import { getApiBaseUrl } from "./config";
 import { ApiError } from "./error";
+import { CONNECTIVITY_MESSAGES } from "../lib/connectivityMessages";
 
 let refreshInFlight: Promise<boolean> | null = null;
 
 function assertOnline(): void {
   if (typeof navigator !== "undefined" && navigator.onLine === false) {
-    throw new Error("No internet connection.");
+    throw new Error(CONNECTIVITY_MESSAGES.offline);
   }
 }
 

@@ -1,0 +1,90 @@
+import { useCallback, useState } from "react";
+import { markRoomRead, parseApiFailure, sendRoomMessage } from "../../../shared/api";
+import type { MessageDto } from "../../../shared/api/types/message";
+import type { ChatRoomMessageView } from "../../../entities/chat";
+import { buildOptimisticOwnMessage, mapMessageDtoToView, mergeMessageList } from "../../../entities/chat/model/mapMessageDto";
+import { CHAT_ROOM_SEND_MESSAGE_FAILURE } from "./constants";
+import { loadInitialRoomMessages } from "./chatRoomMessageUtils";
+import type { RemoteMessages } from "./remoteMessagesPatch";
+
+type Params = {
+  roomId: string | undefined;
+  sessionFullName: string | undefined;
+  patchReadyItems: (update: (items: ChatRoomMessageView[]) => ChatRoomMessageView[]) => void;
+  scrollToLatestMessage: () => void;
+  sendMessageViaSocket: (message: string, clientMessageId?: string) => Promise<boolean>;
+  setRemote: React.Dispatch<React.SetStateAction<RemoteMessages | null>>;
+};
+
+export function useMessageSend({
+  roomId,
+  sessionFullName,
+  patchReadyItems,
+  scrollToLatestMessage,
+  sendMessageViaSocket,
+  setRemote,
+}: Params) {
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+
+  const send = useCallback(
+    async (text: string) => {
+      if (!roomId) {
+        return;
+      }
+      setSendError(null);
+      const clientMessageId = crypto.randomUUID();
+      const authorName = sessionFullName?.trim() || "You";
+      const optimistic = buildOptimisticOwnMessage(text, authorName, clientMessageId);
+
+      patchReadyItems((items) => mergeMessageList(items, optimistic));
+      scrollToLatestMessage();
+
+      setIsSending(true);
+      try {
+        let sentViaSocket = false;
+        try {
+          sentViaSocket = await sendMessageViaSocket(text, clientMessageId);
+        } catch {
+          sentViaSocket = false;
+        }
+        let created: MessageDto | null = null;
+        if (!sentViaSocket) {
+          created = await sendRoomMessage(roomId, { message: text });
+        }
+        const optimisticId = optimistic.id;
+        if (created) {
+          patchReadyItems((items) => {
+            const next = items.filter((m) => m.id !== optimisticId);
+            return mergeMessageList(next, mapMessageDtoToView(created));
+          });
+          void markRoomRead(roomId, { messageId: created.id }).catch(() => {});
+        } else {
+          const { items, pagination } = await loadInitialRoomMessages(roomId);
+          setRemote({
+            roomId,
+            kind: "ready",
+            items,
+            pagination,
+          });
+        }
+      } catch (err: unknown) {
+        patchReadyItems((items) => items.filter((m) => m.id !== optimistic.id));
+        setSendError(parseApiFailure(err, CHAT_ROOM_SEND_MESSAGE_FAILURE));
+        throw err;
+      } finally {
+        setIsSending(false);
+      }
+    },
+    [
+      roomId,
+      sessionFullName,
+      patchReadyItems,
+      scrollToLatestMessage,
+      sendMessageViaSocket,
+      setRemote,
+    ],
+  );
+
+  return { send, isSending, sendError };
+}
