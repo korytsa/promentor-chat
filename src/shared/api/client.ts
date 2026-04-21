@@ -3,12 +3,19 @@ import { ApiError } from "./error";
 
 let refreshInFlight: Promise<boolean> | null = null;
 
+function assertOnline(): void {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    throw new Error("No internet connection.");
+  }
+}
+
 async function tryRefreshSession(): Promise<boolean> {
   if (refreshInFlight) {
     return refreshInFlight;
   }
   refreshInFlight = (async () => {
     try {
+      assertOnline();
       const base = getApiBaseUrl();
       const r = await fetch(`${base}/auth/refresh`, {
         method: "POST",
@@ -65,6 +72,7 @@ function readErrorMessageFromBody(bodyText: string): string | null {
 }
 
 export async function apiFetch(url: string | URL, init: RequestInit = {}): Promise<Response> {
+  assertOnline();
   const headers = new Headers(init.headers);
   if (!headers.has("Accept")) {
     headers.set("Accept", "application/json");

@@ -70,6 +70,10 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
       joinActiveRoom();
     };
 
+    const onDisconnect = () => {
+      setSocketConnectionError("Connection lost. Reconnecting…");
+    };
+
     const onNewMessage = (raw: unknown) => {
       const dto = parseMessageDtoFromSocket(raw);
       if (!dto) {
@@ -109,6 +113,7 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     };
 
     socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
     socket.on("connect_error", onConnectError);
     socket.on(CHAT_SOCKET_EVENTS.newMessage, onNewMessage);
     socket.on(CHAT_SOCKET_EVENTS.error, onChatError);
@@ -122,6 +127,7 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     return () => {
       socket.emit(CHAT_SOCKET_EVENTS.leave, { roomId });
       socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
       socket.off("connect_error", onConnectError);
       socket.off(CHAT_SOCKET_EVENTS.newMessage, onNewMessage);
       socket.off(CHAT_SOCKET_EVENTS.error, onChatError);
@@ -129,6 +135,21 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
       socket.off(CHAT_SOCKET_EVENTS.roomPresence, onRoomPresence);
     };
   }, [roomId]);
+
+  useEffect(() => {
+    const onOffline = () => {
+      setSocketConnectionError("No internet connection.");
+    };
+    const onOnline = () => {
+      setSocketConnectionError(null);
+    };
+    window.addEventListener("offline", onOffline);
+    window.addEventListener("online", onOnline);
+    return () => {
+      window.removeEventListener("offline", onOffline);
+      window.removeEventListener("online", onOnline);
+    };
+  }, []);
 
   const notifyTypingActivity = useCallback(() => {
     const socket = getOrCreateChatSocket();
@@ -149,6 +170,9 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     async (message: string, clientMessageId?: string): Promise<boolean> => {
       if (!roomId) {
         return false;
+      }
+      if (typeof navigator !== "undefined" && navigator.onLine === false) {
+        throw new Error("No internet connection.");
       }
       const socket = getOrCreateChatSocket();
       if (!socket?.connected) {
