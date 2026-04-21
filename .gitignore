@@ -5,3 +5,4 @@ dist
 .pnpm-store
 .vercel
 coverage
+test-results/.last-run.json

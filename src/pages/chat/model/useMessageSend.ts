@@ -20,6 +20,14 @@ type Params = {
   setRemote: React.Dispatch<React.SetStateAction<RemoteMessages | null>>;
 };
 
+function buildClientMessageId(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `fallback-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+}
+
 export function useMessageSend({
   roomId,
   sessionFullName,
@@ -37,7 +45,7 @@ export function useMessageSend({
         return;
       }
       setSendError(null);
-      const clientMessageId = crypto.randomUUID();
+      const clientMessageId = buildClientMessageId();
       const authorName = sessionFullName?.trim() || "You";
       const optimistic = buildOptimisticOwnMessage(text, authorName, clientMessageId);
 

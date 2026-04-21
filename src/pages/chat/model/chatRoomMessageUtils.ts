@@ -72,7 +72,7 @@ export function appendIncomingDto(prev: ReadyRemote, dto: MessageDto): ReadyRemo
     kind: "ready",
     items: merged,
     pagination: {
-      total: prev.pagination.total + 1,
+      total: prev.pagination.total,
       oldestLoadedOffset: prev.pagination.oldestLoadedOffset,
     },
   };

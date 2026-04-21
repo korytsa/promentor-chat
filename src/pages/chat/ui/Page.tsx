@@ -173,7 +173,7 @@ export default function ChatPage() {
               <Typography
                 component="p"
                 variantStyle="caption"
-                className="max-w-[12rem] text-right text-red-200/90"
+                className="max-w-48 text-right text-red-200/90"
               >
                 {leaveError}
               </Typography>

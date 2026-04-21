@@ -12,6 +12,14 @@ export function useChatRoomMessages(
   messagesScrollRef?: RefObject<HTMLDivElement | null>,
 ) {
   const { session } = useHostAuthSession();
+  const isNearBottom = useCallback(() => {
+    const el = messagesScrollRef?.current;
+    if (!el) {
+      return true;
+    }
+    const distanceToBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+    return distanceToBottom <= 96;
+  }, [messagesScrollRef]);
 
   const scrollToLatestMessage = useCallback(() => {
     if (!messagesScrollRef?.current) {
@@ -48,10 +56,13 @@ export function useChatRoomMessages(
 
   const onIncomingDto = useCallback(
     (dto: Parameters<typeof applyIncomingDto>[0]) => {
+      const shouldAutoScroll = dto.senderId === session.user?.id || isNearBottom();
       applyIncomingDto(dto);
-      scrollToLatestMessage();
+      if (shouldAutoScroll) {
+        scrollToLatestMessage();
+      }
     },
-    [applyIncomingDto, scrollToLatestMessage],
+    [applyIncomingDto, isNearBottom, scrollToLatestMessage, session.user?.id],
   );
 
   const {

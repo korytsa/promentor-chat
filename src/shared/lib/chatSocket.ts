@@ -16,3 +16,11 @@ export function getOrCreateChatSocket(): Socket | null {
   }
   return socket;
 }
+
+export function resetChatSocket(): void {
+  if (!socket) {
+    return;
+  }
+  socket.disconnect();
+  socket = null;
+}

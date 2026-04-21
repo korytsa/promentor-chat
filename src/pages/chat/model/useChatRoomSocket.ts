@@ -1,9 +1,8 @@
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import type { MessageDto } from "../../../shared/api/types/message";
 import { useHostAuthSession } from "../../../features/auth";
-import { getOrCreateChatSocket } from "../../../shared/lib/chatSocket";
+import { getOrCreateChatSocket, resetChatSocket } from "../../../shared/lib/chatSocket";
 import { CHAT_SOCKET_EVENTS } from "../../../shared/lib/chatSocketEvents";
-import { dispatchChatRoomsInvalidate } from "../../../shared/lib/chatRoomsInvalidate";
 import { CONNECTIVITY_MESSAGES } from "../../../shared/lib/connectivityMessages";
 import { parseMessageDtoFromSocket } from "../../../shared/lib/parseSocketMessageDto";
 import {
@@ -29,6 +28,7 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
   const selfUserIdRef = useRef<string | undefined>(undefined);
   const onIncomingRef = useRef(onIncomingDto);
   const typingIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousUserIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     roomIdRef.current = roomId;
@@ -36,6 +36,16 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
 
   useEffect(() => {
     selfUserIdRef.current = session.user?.id;
+  }, [session.user?.id]);
+
+  useEffect(() => {
+    const previousUserId = previousUserIdRef.current;
+    const nextUserId = session.user?.id;
+    previousUserIdRef.current = nextUserId;
+    if (previousUserId === undefined || previousUserId === nextUserId) {
+      return;
+    }
+    resetChatSocket();
   }, [session.user?.id]);
 
   useEffect(() => {
@@ -80,7 +90,6 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
       if (!dto) {
         return;
       }
-      dispatchChatRoomsInvalidate();
       if (dto.roomId !== roomIdRef.current) {
         return;
       }

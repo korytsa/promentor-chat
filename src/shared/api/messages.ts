@@ -1,5 +1,6 @@
 import { apiFetch, apiJson } from "./client";
 import { roomsBasePath } from "./rooms";
+import { ApiError } from "./error";
 import type { MessageDto, MessagesPageDto } from "./types/message";
 
 export async function fetchRoomMessages(
@@ -31,7 +32,11 @@ export async function sendRoomMessage(
   if (!text.trim()) {
     return null;
   }
-  return JSON.parse(text) as MessageDto;
+  try {
+    return JSON.parse(text) as MessageDto;
+  } catch {
+    throw new ApiError(response.status, "Invalid JSON response.");
+  }
 }
 
 export type MarkRoomReadBody = {

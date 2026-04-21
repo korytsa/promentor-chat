@@ -112,6 +112,9 @@ export async function apiJson<T>(url: string | URL, init: RequestInit = {}): Pro
   if (!text) {
     return undefined as T;
   }
-
-  return JSON.parse(text) as T;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new ApiError(response.status, "Invalid JSON response.");
+  }
 }
