@@ -12,9 +12,10 @@ export default function App() {
         <ChatSidebar />
         <Routes>
           <Route path="/" element={<ChatEmptyPage />} />
+          <Route path="/chat" element={<ChatEmptyPage />} />
           <Route path="/chat/:chatId" element={<ChatPage />} />
           <Route path="/chat/create-group" element={<CreateGroupPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/chat" replace />} />
         </Routes>
       </main>
     </AppBackground>

@@ -10,14 +10,20 @@
   },
   "scripts": {
     "dev": "vite",
+    "mf:build:watch": "vite build --watch",
+    "mf:preview": "vite preview --host localhost --port 4174 --strictPort",
     "build": "vite build",
     "preview": "vite preview",
-    "mf:serve": "pnpm build && pnpm preview --host localhost --port 4174 --strictPort",
+    "mf:serve": "concurrently -k -n BUILD,PREVIEW -c cyan,magenta \"pnpm mf:build:watch\" \"pnpm mf:preview\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm lint"
+    "check": "pnpm typecheck && pnpm lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -30,23 +36,35 @@
     "react-hook-form": "^7.72.0",
     "react-icons": "^5.6.0",
     "react-router-dom": "^7.13.2",
+    "socket.io-client": "^4.8.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@originjs/vite-plugin-federation": "^1.4.1",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/vite": "^4.2.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^4.1.5",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "happy-dom": "^20.9.0",
+    "jsdom": "^29.0.2",
+    "msw": "^2.13.4",
+    "playwright": "^1.59.1",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.2",
-    "vite": "^6.4.1"
+    "vite": "^6.4.1",
+    "vitest": "^4.1.5"
   }
 }

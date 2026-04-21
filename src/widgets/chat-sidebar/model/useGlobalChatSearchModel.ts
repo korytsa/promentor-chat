@@ -1,17 +1,22 @@
 import { useId, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import type { KeyboardEvent } from "react";
-import type { SearchUser } from "../../../entities/chat";
+import type { ChatSearchOption } from "../../../entities/chat";
 
 type Params = {
   isOpen: boolean;
-  filteredUsers: SearchUser[];
+  filteredUsers: ChatSearchOption[];
   setQuery: (value: string) => void;
   setIsOpen: (value: boolean) => void;
+  onSelectOption: (option: ChatSearchOption) => boolean | Promise<boolean>;
 };
 
-export function useGlobalChatSearchModel({ isOpen, filteredUsers, setQuery, setIsOpen }: Params) {
-  const navigate = useNavigate();
+export function useGlobalChatSearchModel({
+  isOpen,
+  filteredUsers,
+  setQuery,
+  setIsOpen,
+  onSelectOption,
+}: Params) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const listboxId = useId();
 
@@ -27,13 +32,17 @@ export function useGlobalChatSearchModel({ isOpen, filteredUsers, setQuery, setI
     setActiveIndex(-1);
   };
 
-  const openChatFromIndex = (index: number) => {
+  const openChatFromIndex = async (index: number) => {
     const user = filteredUsers[index];
     if (!user) {
       return;
     }
 
-    navigate(`/chat/${user.chatId}`);
+    const ok = await Promise.resolve(onSelectOption(user));
+    if (ok === false) {
+      return;
+    }
+
     setQuery("");
     closeListbox();
   };
@@ -87,7 +96,7 @@ export function useGlobalChatSearchModel({ isOpen, filteredUsers, setQuery, setI
 
     if (event.key === "Enter" && normalizedActiveIndex >= 0) {
       event.preventDefault();
-      openChatFromIndex(normalizedActiveIndex);
+      void openChatFromIndex(normalizedActiveIndex);
     }
   };
 

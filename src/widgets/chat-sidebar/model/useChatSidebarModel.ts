@@ -1,20 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { CONVERSATIONS, SEARCH_USERS } from "../../../entities/chat";
+import { SIDEBAR_CONVERSATION_CATEGORY_CLASS } from "./constants";
+import { useDmOpenOrCreate } from "./useDmOpenOrCreate";
+import { useGlobalUserSearch } from "./useGlobalUserSearch";
+import { useRoomsList } from "./useRoomsList";
 
-export function useChatSidebarModel() {
+type UseChatSidebarModelOptions = {
+  excludeUserId?: string;
+};
+
+export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
+  const excludeUserId = options?.excludeUserId;
   const location = useLocation();
-  const [query, setQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const { status, errorMessage, directMessages, groupMessages, conversations } = useRoomsList();
+  const searchState = useGlobalUserSearch({ conversations, excludeUserId });
+  const { onSelectSearchOption } = useDmOpenOrCreate({
+    setDmCreateError: searchState.setDmCreateError,
+  });
+  const { containerRef, setIsOpen } = searchState;
 
-  const q = query.trim().toLowerCase();
-  const filteredUsers = SEARCH_USERS.filter((user) => user.name.toLowerCase().includes(q));
-
-  const directMessages = CONVERSATIONS.filter((conversation) => conversation.category === "direct");
-  const groupMessages = CONVERSATIONS.filter((conversation) => conversation.category === "group");
-
-  const categoryClassName = "mb-1 text-[12px] font-bold text-white/50";
   const isListRoute = location.pathname === "/" || location.pathname === "/chat";
   const visibilityClassName = isListRoute ? "flex md:flex" : "hidden md:flex";
 
@@ -27,20 +31,28 @@ export function useChatSidebarModel() {
 
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, []);
+  }, [containerRef, setIsOpen]);
 
   return {
     search: {
-      query,
-      setQuery,
-      isOpen,
-      setIsOpen,
-      containerRef,
-      filteredUsers,
+      query: searchState.query,
+      setQuery: searchState.setQuery,
+      isOpen: searchState.isOpen,
+      setIsOpen: searchState.setIsOpen,
+      containerRef: searchState.containerRef,
+      filteredUsers: searchState.filteredUsers,
+      onSelectSearchOption,
+      userSearchLoading: searchState.userSearchLoading,
+      userSearchError: searchState.userSearchError,
+      directoryLoading: searchState.directoryLoading,
+      directoryError: searchState.directoryError,
+      dmCreateError: searchState.dmCreateError,
     },
     directMessages,
     groupMessages,
-    categoryClassName,
+    categoryClassName: SIDEBAR_CONVERSATION_CATEGORY_CLASS,
     visibilityClassName,
+    status,
+    errorMessage,
   };
 }
