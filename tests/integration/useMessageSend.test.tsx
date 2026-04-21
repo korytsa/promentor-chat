@@ -8,13 +8,13 @@ const parseApiFailureMock = vi.fn(() => "send failed");
 const loadInitialRoomMessagesMock = vi.fn();
 
 vi.mock("../../src/shared/api", () => ({
-  sendRoomMessage: (...args: unknown[]) => sendRoomMessageMock(...args),
-  markRoomRead: (...args: unknown[]) => markRoomReadMock(...args),
-  parseApiFailure: (...args: unknown[]) => parseApiFailureMock(...args),
+  sendRoomMessage: sendRoomMessageMock,
+  markRoomRead: markRoomReadMock,
+  parseApiFailure: parseApiFailureMock,
 }));
 
 vi.mock("../../src/pages/chat/model/chatRoomMessageUtils", () => ({
-  loadInitialRoomMessages: (...args: unknown[]) => loadInitialRoomMessagesMock(...args),
+  loadInitialRoomMessages: loadInitialRoomMessagesMock,
 }));
 
 describe("useMessageSend", () => {

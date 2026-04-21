@@ -15,9 +15,9 @@ vi.mock("react-router-dom", () => ({
 
 vi.mock("../../src/shared/api", () => ({
   ApiError,
-  createRoom: (...args: unknown[]) => createRoomMock(...args),
-  fetchRooms: (...args: unknown[]) => fetchRoomsMock(...args),
-  parseApiFailure: (...args: unknown[]) => parseApiFailureMock(...args),
+  createRoom: createRoomMock,
+  fetchRooms: fetchRoomsMock,
+  parseApiFailure: parseApiFailureMock,
 }));
 
 vi.mock("../../src/shared/lib/chatRoomsInvalidate", () => ({

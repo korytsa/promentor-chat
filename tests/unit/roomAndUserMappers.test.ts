@@ -17,7 +17,6 @@ describe("mapRoomListItemToConversation", () => {
       type: "group",
       updatedAt: "2025-01-01T00:00:00.000Z",
       avatarUrls: ["a.png", "", null as unknown as string],
-      members: [],
     });
 
     expect(result.title).toBe("Visible title");
