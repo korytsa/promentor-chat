@@ -3,6 +3,7 @@ import type { MessageDto } from "../../../shared/api/types/message";
 import { useHostAuthSession } from "../../../features/auth";
 import { getOrCreateChatSocket } from "../../../shared/lib/chatSocket";
 import { CHAT_SOCKET_EVENTS } from "../../../shared/lib/chatSocketEvents";
+import { dispatchChatRoomsInvalidate } from "../../../shared/lib/chatRoomsInvalidate";
 import { parseMessageDtoFromSocket } from "../../../shared/lib/parseSocketMessageDto";
 import {
   parseChatRoomPresencePayload,
@@ -71,7 +72,12 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
 
     const onNewMessage = (raw: unknown) => {
       const dto = parseMessageDtoFromSocket(raw);
-      if (!dto || dto.roomId !== roomIdRef.current) {
+      if (!dto) {
+        return;
+      }
+      // Keep sidebar rooms list in sync for recipients without page refresh.
+      dispatchChatRoomsInvalidate();
+      if (dto.roomId !== roomIdRef.current) {
         return;
       }
       onIncomingRef.current(dto);

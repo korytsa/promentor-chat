@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { createRoom, fetchRooms, parseApiFailure } from "../../../shared/api";
+import { ApiError, createRoom, fetchRooms, parseApiFailure } from "../../../shared/api";
 import type { ChatSearchOption, Conversation } from "../../../entities/chat";
 import {
   mapRoomListItemToConversation,
@@ -19,6 +19,8 @@ import {
   CHAT_ROOMS_INVALIDATE_EVENT,
   dispatchChatRoomsInvalidate,
 } from "../../../shared/lib/chatRoomsInvalidate";
+import { getOrCreateChatSocket } from "../../../shared/lib/chatSocket";
+import { CHAT_SOCKET_EVENTS } from "../../../shared/lib/chatSocketEvents";
 import { USER_SEARCH_DEBOUNCE_MS, USER_SEARCH_MIN_QUERY_LEN } from "../../../shared/lib/constants/userSearch";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue";
 import { useUserSearch } from "../../../shared/lib/useUserSearch";
@@ -86,6 +88,34 @@ export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
 
   const [dmCreateError, setDmCreateError] = useState<string | null>(null);
   const [roomsRefetchNonce, setRoomsRefetchNonce] = useState(0);
+  const loadRooms = useCallback(
+    async (cancelledRef: { value: boolean }) => {
+      try {
+        const items = await fetchRooms();
+        if (cancelledRef.value) {
+          return;
+        }
+        const mapped = sortRoomsByUpdatedAtDesc(items).map(mapRoomListItemToConversation);
+        setConversations(mapped);
+        setErrorMessage(null);
+        setStatus("ready");
+      } catch (err: unknown) {
+        if (cancelledRef.value) {
+          return;
+        }
+        setConversations([]);
+        setErrorMessage(
+          parseApiFailure(err, {
+            fallback: "Could not load conversations.",
+            unauthorized: "Sign in to load conversations.",
+          }),
+        );
+        setStatus("error");
+      }
+    },
+    [],
+  );
+
 
   const setQuery = useCallback((value: string) => {
     setDmCreateError(null);
@@ -131,36 +161,27 @@ export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
+    const socket = getOrCreateChatSocket();
+    if (!socket) {
+      return;
+    }
+    const onRoomsChanged = () => {
+      setRoomsRefetchNonce((n) => n + 1);
+    };
+    socket.on(CHAT_SOCKET_EVENTS.roomsChanged, onRoomsChanged);
+    return () => {
+      socket.off(CHAT_SOCKET_EVENTS.roomsChanged, onRoomsChanged);
+    };
+  }, []);
 
-    fetchRooms()
-      .then((items) => {
-        if (cancelled) {
-          return;
-        }
-        const mapped = sortRoomsByUpdatedAtDesc(items).map(mapRoomListItemToConversation);
-        setConversations(mapped);
-        setErrorMessage(null);
-        setStatus("ready");
-      })
-      .catch((err: unknown) => {
-        if (cancelled) {
-          return;
-        }
-        setConversations([]);
-        setErrorMessage(
-          parseApiFailure(err, {
-            fallback: "Could not load conversations.",
-            unauthorized: "Sign in to load conversations.",
-          }),
-        );
-        setStatus("error");
-      });
+  useEffect(() => {
+    const cancelledRef = { value: false };
+    void loadRooms(cancelledRef);
 
     return () => {
-      cancelled = true;
+      cancelledRef.value = true;
     };
-  }, [roomsRefetchNonce]);
+  }, [roomsRefetchNonce, loadRooms]);
 
   const q = query.trim().toLowerCase();
 
@@ -216,6 +237,30 @@ export function useChatSidebarModel(options?: UseChatSidebarModelOptions) {
           navigate(`/chat/${room.id}`);
           return true;
         } catch (err: unknown) {
+          if (err instanceof ApiError && err.status === 400) {
+            try {
+              const rooms = await fetchRooms();
+              const conversations = sortRoomsByUpdatedAtDesc(rooms).map(mapRoomListItemToConversation);
+              const existingDm = conversations.find((c) =>
+                isSamePersonAsDirectRoom(
+                  {
+                    id: c.id,
+                    name: c.title,
+                    avatarUrl: c.avatarUrls[0] ?? "",
+                    conversationCategory: c.category,
+                  },
+                  option,
+                ),
+              );
+              if (existingDm) {
+                dispatchChatRoomsInvalidate();
+                navigate(`/chat/${existingDm.id}`);
+                return true;
+              }
+            } catch {
+              // keep default DM create error handling below
+            }
+          }
           setDmCreateError(parseApiFailure(err, CHAT_SEARCH_DM_FAILURE));
           return false;
         }
