@@ -2,17 +2,13 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useMessageSend } from "../../src/pages/chat/model/useMessageSend";
 
-const {
-  sendRoomMessageMock,
-  markRoomReadMock,
-  parseApiFailureMock,
-  loadInitialRoomMessagesMock,
-} = vi.hoisted(() => ({
-  sendRoomMessageMock: vi.fn(),
-  markRoomReadMock: vi.fn(),
-  parseApiFailureMock: vi.fn(() => "send failed"),
-  loadInitialRoomMessagesMock: vi.fn(),
-}));
+const { sendRoomMessageMock, markRoomReadMock, parseApiFailureMock, loadInitialRoomMessagesMock } =
+  vi.hoisted(() => ({
+    sendRoomMessageMock: vi.fn(),
+    markRoomReadMock: vi.fn(),
+    parseApiFailureMock: vi.fn(() => "send failed"),
+    loadInitialRoomMessagesMock: vi.fn(),
+  }));
 
 vi.mock("../../src/shared/api", () => ({
   sendRoomMessage: sendRoomMessageMock,
