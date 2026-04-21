@@ -13,22 +13,28 @@ export function mapMessageDtoToView(dto: MessageDto): ChatRoomMessageView {
     authorName: dto.sender.fullName,
     avatarUrl: dto.sender.avatarUrl ?? undefined,
     isOwn: dto.isOwn,
+    clientMessageId: dto.clientMessageId,
   };
 }
 
 export function buildOptimisticOwnMessage(
   text: string,
   authorName: string,
+  clientMessageId?: string,
 ): ChatRoomMessageView {
   const createdAt = new Date().toISOString();
+  const optimisticId = clientMessageId
+    ? `${OPTIMISTIC_MESSAGE_ID_PREFIX}${clientMessageId}`
+    : `${OPTIMISTIC_MESSAGE_ID_PREFIX}${crypto.randomUUID()}`;
   return {
-    id: `${OPTIMISTIC_MESSAGE_ID_PREFIX}${crypto.randomUUID()}`,
+    id: optimisticId,
     createdAt,
     text,
     timeLabel: formatMessageTime(createdAt),
     authorName,
     isOwn: true,
     pending: true,
+    clientMessageId,
   };
 }
 

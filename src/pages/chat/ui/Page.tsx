@@ -156,11 +156,6 @@ export default function ChatPage() {
                   {presenceOnlineCount} online
                 </Typography>
               ) : null}
-              {othersTyping ? (
-                <Typography component="p" variantStyle="caption" className="text-xs text-white/55">
-                  {CHAT_PAGE_COPY.typingOthers}
-                </Typography>
-              ) : null}
             </div>
           </div>
 
@@ -241,6 +236,7 @@ export default function ChatPage() {
         disabled={messagesLoading || Boolean(messagesError)}
         isSending={isSending}
         sendError={sendError}
+        typingHint={othersTyping ? CHAT_PAGE_COPY.typingOthers : null}
         onTypingActivity={notifyTypingActivity}
       />
     </div>

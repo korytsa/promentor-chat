@@ -139,6 +139,21 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     }, CHAT_TYPING_IDLE_MS);
   }, [roomId]);
 
+  const sendMessageViaSocket = useCallback(
+    async (message: string, clientMessageId?: string): Promise<boolean> => {
+      if (!roomId) {
+        return false;
+      }
+      const socket = getOrCreateChatSocket();
+      if (!socket?.connected) {
+        throw new Error("Socket is not connected.");
+      }
+      socket.emit(CHAT_SOCKET_EVENTS.sendMessage, { roomId, message, clientMessageId });
+      return true;
+    },
+    [roomId],
+  );
+
   useEffect(() => {
     return () => {
       if (typingIdleTimerRef.current) {
@@ -155,5 +170,6 @@ export function useChatRoomSocket({ roomId, onIncomingDto }: UseChatRoomSocketPa
     othersTyping,
     presenceOnlineCount,
     notifyTypingActivity,
+    sendMessageViaSocket,
   };
 }

@@ -12,6 +12,7 @@ export type MessageDto = {
   createdAt: string;
   sender: MessageSenderDto;
   isOwn: boolean;
+  clientMessageId?: string;
 };
 
 export type MessagesPageDto = {

@@ -25,6 +25,7 @@ export type ChatRoomMessageView = {
   avatarUrl?: string;
   isOwn: boolean;
   pending?: boolean;
+  clientMessageId?: string;
 };
 
 export type ChatMessage = {

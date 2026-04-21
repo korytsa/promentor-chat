@@ -1,6 +1,5 @@
 import { type FormEvent, useState } from "react";
-import { IoIosImages, IoIosPaperPlane } from "react-icons/io";
-import { MdEmojiEmotions } from "react-icons/md";
+import { IoIosPaperPlane } from "react-icons/io";
 import { Button, TextField } from "@promentorapp/ui-kit";
 import { CHAT_MESSAGE_MAX_LENGTH } from "../model/constants";
 
@@ -13,6 +12,7 @@ type ChatComposeProps = {
   disabled?: boolean;
   isSending?: boolean;
   sendError?: string | null;
+  typingHint?: string | null;
   onTypingActivity?: () => void;
 };
 
@@ -21,6 +21,7 @@ export function ChatCompose({
   disabled,
   isSending,
   sendError,
+  typingHint,
   onTypingActivity,
 }: ChatComposeProps) {
   const [value, setValue] = useState("");
@@ -48,26 +49,10 @@ export function ChatCompose({
           {sendError}
         </p>
       ) : null}
+      <div className="mb-1 h-4">
+        {typingHint ? <p className="text-xs text-white/55">{typingHint}</p> : null}
+      </div>
       <div className="flex items-center gap-3 rounded-lg ">
-        <Button
-          type="button"
-          aria-label="Attach image"
-          variant="contained"
-          className={iconButtonClassName}
-          disabled={isBusy}
-        >
-          <IoIosImages className={iconClassName} />
-        </Button>
-        <Button
-          type="button"
-          aria-label="Attach emoji"
-          variant="contained"
-          className={iconButtonClassName}
-          disabled={isBusy}
-        >
-          <MdEmojiEmotions className={iconClassName} />
-        </Button>
-
         <div className="flex-1 [&>label]:gap-0 [&>label>p]:sr-only">
           <TextField
             label="Message"

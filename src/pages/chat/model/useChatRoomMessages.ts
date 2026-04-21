@@ -38,6 +38,25 @@ export function useChatRoomMessages(
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [loadOlderError, setLoadOlderError] = useState<string | null>(null);
 
+  const scrollToLatestMessage = useCallback(() => {
+    if (!messagesScrollRef?.current) {
+      return;
+    }
+    const run = () => {
+      const el = messagesScrollRef.current;
+      if (!el) {
+        return;
+      }
+      el.scrollTop = el.scrollHeight;
+    };
+    // Run a few times across frames to avoid render/measure races.
+    run();
+    requestAnimationFrame(() => {
+      run();
+      requestAnimationFrame(run);
+    });
+  }, [messagesScrollRef]);
+
   const paginationRef = useRef<MessagesPaginationState | null>(null);
   useEffect(() => {
     if (remote?.kind === "ready") {
@@ -55,9 +74,11 @@ export function useChatRoomMessages(
   const lastMarkedReadMessageIdRef = useRef<string | null>(null);
   const readReceiptScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemsRef = useRef<ChatRoomMessageView[]>([]);
+  const bufferedIncomingRef = useRef<MessageDto[]>([]);
 
   useEffect(() => {
     lastMarkedReadMessageIdRef.current = null;
+    bufferedIncomingRef.current = [];
   }, [roomId]);
 
   useEffect(() => {
@@ -84,6 +105,7 @@ export function useChatRoomMessages(
       };
       setRemote((prev) => {
         if (!prev || prev.roomId !== roomId || prev.kind !== "ready") {
+          bufferedIncomingRef.current.push(resolved);
           return prev;
         }
         if (dto.roomId !== roomId) {
@@ -91,8 +113,9 @@ export function useChatRoomMessages(
         }
         return appendIncomingDto(prev, resolved);
       });
+      scrollToLatestMessage();
     },
-    [roomId, session.user?.id],
+    [roomId, session.user?.id, scrollToLatestMessage],
   );
 
   const {
@@ -101,6 +124,7 @@ export function useChatRoomMessages(
     othersTyping,
     presenceOnlineCount,
     notifyTypingActivity,
+    sendMessageViaSocket,
   } = useChatRoomSocket({ roomId, onIncomingDto });
 
   useEffect(() => {
@@ -114,13 +138,35 @@ export function useChatRoomMessages(
         if (cancelled) {
           return;
         }
+        const bufferedForRoom = bufferedIncomingRef.current.filter((m) => m.roomId === roomId);
+        bufferedIncomingRef.current = [];
+        let mergedItems = items;
+        mergedItems =
+          bufferedForRoom.length > 0
+            ? bufferedForRoom.reduce<ChatRoomMessageView[]>(
+                (acc, dto) =>
+                  appendIncomingDto(
+                    {
+                      roomId,
+                      kind: "ready",
+                      items: acc,
+                      pagination: { total: pagination.total, oldestLoadedOffset: pagination.oldestLoadedOffset },
+                    },
+                    {
+                      ...dto,
+                      isOwn: dto.senderId === session.user?.id,
+                    },
+                  ).items,
+                mergedItems,
+              )
+            : mergedItems;
         setRemote({
           roomId,
           kind: "ready",
-          items,
+          items: mergedItems,
           pagination,
         });
-        const mid = latestServerMessageId(items);
+        const mid = latestServerMessageId(mergedItems);
         lastMarkedReadMessageIdRef.current = mid ?? null;
         void markRoomRead(roomId, mid ? { messageId: mid } : {}).catch(() => {});
       })
@@ -138,7 +184,7 @@ export function useChatRoomMessages(
     return () => {
       cancelled = true;
     };
-  }, [roomId]);
+  }, [roomId, session.user?.id]);
 
   const loadOlder = useCallback(async () => {
     if (!roomId || loadingOlderRef.current) {
@@ -254,25 +300,27 @@ export function useChatRoomMessages(
         return;
       }
       setSendError(null);
+      const clientMessageId = crypto.randomUUID();
       const authorName = session.user?.fullName?.trim() || "You";
-      const optimistic = buildOptimisticOwnMessage(text, authorName);
+      const optimistic = buildOptimisticOwnMessage(text, authorName, clientMessageId);
 
       setRemote((prev) =>
         patchReadyForRoom(roomId, prev, (items) => mergeMessageList(items, optimistic)),
       );
-      if (messagesScrollRef?.current) {
-        requestAnimationFrame(() => {
-          const el = messagesScrollRef.current;
-          if (!el) {
-            return;
-          }
-          el.scrollTop = el.scrollHeight;
-        });
-      }
+      scrollToLatestMessage();
 
       setIsSending(true);
       try {
-        const created = await sendRoomMessage(roomId, { message: text });
+        let sentViaSocket = false;
+        try {
+          sentViaSocket = await sendMessageViaSocket(text, clientMessageId);
+        } catch {
+          sentViaSocket = false;
+        }
+        let created: MessageDto | null = null;
+        if (!sentViaSocket) {
+          created = await sendRoomMessage(roomId, { message: text });
+        }
         const optimisticId = optimistic.id;
         if (created) {
           setRemote((prev) =>
@@ -302,7 +350,7 @@ export function useChatRoomMessages(
         setIsSending(false);
       }
     },
-    [roomId, session.user?.fullName, messagesScrollRef],
+    [roomId, session.user?.fullName, sendMessageViaSocket, scrollToLatestMessage],
   );
 
   const isLoading = roomId !== undefined && (!remote || remote.roomId !== roomId);

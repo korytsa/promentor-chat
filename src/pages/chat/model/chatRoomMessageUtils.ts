@@ -3,6 +3,7 @@ import { fetchRoomMessages } from "../../../shared/api";
 import type { ChatRoomMessageView } from "../../../entities/chat";
 import {
   mapMessageDtoToView,
+  OPTIMISTIC_MESSAGE_ID_PREFIX,
   mergeMessageList,
   mergePrependedMessages,
 } from "../../../entities/chat/model/mapMessageDto";
@@ -49,8 +50,20 @@ export function mergeOlderMessagesPage(
 
 export function appendIncomingDto(prev: ReadyRemote, dto: MessageDto): ReadyRemote {
   const next = mapMessageDtoToView(dto);
-  const beforeLen = prev.items.length;
-  const merged = mergeMessageList(prev.items, next);
+  const optimisticIdByClientMessageId = dto.clientMessageId
+    ? `${OPTIMISTIC_MESSAGE_ID_PREFIX}${dto.clientMessageId}`
+    : null;
+  const cleanedItems =
+    dto.isOwn === true
+      ? prev.items.filter((m) => {
+          if (optimisticIdByClientMessageId && m.id === optimisticIdByClientMessageId) {
+            return false;
+          }
+          return !(m.pending && m.isOwn && m.text.trim() === next.text.trim());
+        })
+      : prev.items;
+  const beforeLen = cleanedItems.length;
+  const merged = mergeMessageList(cleanedItems, next);
   if (merged.length === beforeLen) {
     return prev;
   }
