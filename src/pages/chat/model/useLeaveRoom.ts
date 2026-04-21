@@ -18,7 +18,7 @@ export function useLeaveRoom(roomId: string | undefined, category: "direct" | "g
     try {
       await removeSelfFromRoom(roomId);
       dispatchChatRoomsInvalidate();
-      navigate("/", { replace: true });
+      navigate("/chat", { replace: true });
     } catch (err: unknown) {
       setError(parseApiFailure(err, CHAT_LEAVE_ROOM_FAILURE));
     } finally {

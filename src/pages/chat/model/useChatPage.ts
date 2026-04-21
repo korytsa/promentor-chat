@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { fetchRoomById, parseApiFailure } from "../../../shared/api";
 import type { Conversation } from "../../../entities/chat";
 import { mapRoomListItemToConversation } from "../../../entities/chat/model/mapRoomListItem";
@@ -18,12 +18,28 @@ type RemoteState =
   | { chatId: string; kind: "ready"; viewModel: ChatPageReadyViewModel }
   | { chatId: string; kind: "error"; message: string };
 
+const UUID_V4ISH_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export function useChatPage(): ChatPageState {
   const { chatId } = useParams();
+  const navigate = useNavigate();
   const [remote, setRemote] = useState<RemoteState | null>(null);
 
   useEffect(() => {
     if (!chatId) {
+      return;
+    }
+    if (UUID_V4ISH_RE.test(chatId)) {
+      return;
+    }
+    navigate("/chat", { replace: true });
+  }, [chatId, navigate]);
+
+  useEffect(() => {
+    if (!chatId) {
+      return;
+    }
+    if (!UUID_V4ISH_RE.test(chatId)) {
       return;
     }
     let cancelled = false;
