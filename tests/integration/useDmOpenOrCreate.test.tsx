@@ -3,11 +3,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "../../src/shared/api/error";
 import { useDmOpenOrCreate } from "../../src/widgets/chat-sidebar/model/useDmOpenOrCreate";
 
-const navigateMock = vi.fn();
-const createRoomMock = vi.fn();
-const fetchRoomsMock = vi.fn();
-const parseApiFailureMock = vi.fn(() => "failed");
-const invalidateMock = vi.fn();
+const {
+  navigateMock,
+  createRoomMock,
+  fetchRoomsMock,
+  parseApiFailureMock,
+  invalidateMock,
+} = vi.hoisted(() => ({
+  navigateMock: vi.fn(),
+  createRoomMock: vi.fn(),
+  fetchRoomsMock: vi.fn(),
+  parseApiFailureMock: vi.fn(() => "failed"),
+  invalidateMock: vi.fn(),
+}));
 
 vi.mock("react-router-dom", () => ({
   useNavigate: () => navigateMock,
