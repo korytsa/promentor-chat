@@ -1,5 +1,8 @@
 node_modules
 dist
+.env
 .DS_Store
 .pnpm-store
 .vercel
+coverage
+test-results/.last-run.json

@@ -1,78 +1,269 @@
-import { CONVERSATIONS, MESSAGES } from "../model/constants";
+import { Typography, Avatar, Button } from "@promentorapp/ui-kit";
+import { BiExit } from "react-icons/bi";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { MessageBubble } from "../../../entities/chat";
+import { ChatCompose } from "../../../features/chat-compose";
+import { MobileBackLink } from "../../../shared/ui/MobileBackLink";
+import { CHAT_PAGE_COPY, CHAT_SCROLL_LOAD_TOP_PX } from "../model/constants";
+import { useChatPage } from "../model/useChatPage";
+import { useChatRoomMessages } from "../model/useChatRoomMessages";
+import { useLeaveRoom } from "../model/useLeaveRoom";
 
 export default function ChatPage() {
-  return (
-    <main className="min-h-screen text-slate-100">
-      <div className="mx-auto flex max-w-7xl gap-6">
-        <aside className="hidden w-72 flex-col rounded-2xl border border-slate-800 bg-slate-900/40 p-4 backdrop-blur md:flex">
-          <div className="mb-4">
-            <h1 className="text-lg font-semibold">ProMentor Chat</h1>
-            <p className="mt-1 text-sm text-slate-400">Smart coaching conversations</p>
-          </div>
+  const { chatId } = useParams();
+  const pageState = useChatPage();
+  const messagesScrollRef = useRef<HTMLDivElement>(null);
+  const didInitialScrollRef = useRef(false);
+  const scrollLoadLockRef = useRef(false);
 
-          <button className="mb-5 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-cyan-400">
-            + New Chat
-          </button>
+  useEffect(() => {
+    didInitialScrollRef.current = false;
+  }, [chatId]);
 
-          <div className="flex flex-col gap-2">
-            {CONVERSATIONS.map((item) => (
-              <button
-                key={item.id}
-                className="w-full rounded-xl border border-transparent bg-slate-800/70 px-3 py-2 text-left transition hover:border-slate-700 hover:bg-slate-800"
-              >
-                <p className="text-sm font-medium">{item.title}</p>
-                <p className="text-xs text-slate-400">{item.updatedAt}</p>
-              </button>
-            ))}
-          </div>
-        </aside>
+  const {
+    items: messages,
+    isLoading: messagesLoading,
+    errorMessage: messagesError,
+    send,
+    isSending,
+    sendError,
+    hasMoreOlder,
+    loadingOlder,
+    loadOlderError,
+    loadOlder,
+    socketConnectionError,
+    socketRoomError,
+    othersTyping,
+    presenceOnlineCount,
+    notifyTypingActivity,
+    onMessagesScrollForReadReceipt,
+  } = useChatRoomMessages(chatId, messagesScrollRef);
 
-        <section className="flex min-h-[80vh] flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/50 backdrop-blur">
-          <header className="border-b border-slate-800 px-5 py-4">
-            <h2 className="text-base font-semibold">Chat Assistant</h2>
-            <p className="text-sm text-slate-400">Ask about plans, goals, and productivity.</p>
-          </header>
+  useLayoutEffect(() => {
+    if (messagesLoading || messages.length === 0) {
+      return;
+    }
+    const el = messagesScrollRef.current;
+    if (!el || didInitialScrollRef.current) {
+      return;
+    }
+    el.scrollTop = el.scrollHeight;
+    didInitialScrollRef.current = true;
+  }, [messagesLoading, messages.length, chatId]);
 
-          <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
-            {MESSAGES.map((message) => {
-              const isUser = message.role === "user";
+  const handleMessagesScroll = useCallback(() => {
+    const el = messagesScrollRef.current;
+    if (!el) {
+      return;
+    }
+    onMessagesScrollForReadReceipt();
+    if (!hasMoreOlder || loadingOlder || scrollLoadLockRef.current) {
+      return;
+    }
+    if (el.scrollTop >= CHAT_SCROLL_LOAD_TOP_PX) {
+      return;
+    }
+    scrollLoadLockRef.current = true;
+    void loadOlder().finally(() => {
+      scrollLoadLockRef.current = false;
+    });
+  }, [hasMoreOlder, loadingOlder, loadOlder, onMessagesScrollForReadReceipt]);
 
-              return (
-                <div
-                  key={message.id}
-                  className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                      isUser
-                        ? "bg-cyan-500 text-slate-950"
-                        : "border border-slate-800 bg-slate-800/70 text-slate-100"
-                    }`}
-                  >
-                    {message.text}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+  const {
+    leave,
+    busy: leaveBusy,
+    error: leaveError,
+  } = useLeaveRoom(
+    chatId,
+    pageState.status === "ready" ? pageState.viewModel.activeConversation.category : undefined,
+  );
 
-          <form className="border-t border-slate-800 p-4">
-            <div className="flex items-center gap-3 rounded-xl border border-slate-700 px-3 py-2">
-              <input
-                type="text"
-                placeholder="Type your message..."
-                className="w-full bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500"
-              />
-              <button
-                type="submit"
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-cyan-400"
-              >
-                Send
-              </button>
-            </div>
-          </form>
-        </section>
+  if (pageState.status === "empty") {
+    return null;
+  }
+
+  if (pageState.status === "loading") {
+    return (
+      <div className="flex min-h-0 flex-1 items-center justify-center sm:rounded-lg sm:border border-white/20 px-4 py-12">
+        <Typography component="p" variantStyle="body">
+          Loading conversation…
+        </Typography>
       </div>
-    </main>
+    );
+  }
+
+  if (pageState.status === "error") {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 sm:rounded-lg sm:border border-white/20 px-4 py-12">
+        <Typography component="p" variantStyle="subtitle">
+          Something went wrong
+        </Typography>
+        <Typography component="p" variantStyle="caption" className="text-center text-white/70">
+          {pageState.message}
+        </Typography>
+      </div>
+    );
+  }
+
+  const { activeConversation } = pageState.viewModel;
+  const leaveLabel =
+    activeConversation.category === "direct"
+      ? CHAT_PAGE_COPY.leaveDirect
+      : CHAT_PAGE_COPY.leaveGroup;
+  const headerAvatars = activeConversation.avatarUrls.slice(0, 3);
+  const overflowCount =
+    activeConversation.avatarUrls.length > 3 ? activeConversation.avatarUrls.length - 3 : 0;
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden sm:rounded-lg sm:border border-white/20">
+      <header className="flex shrink-0 items-center rounded-tr-lg border-b border-white/20 px-4 py-2">
+        <div className="flex w-full items-center justify-between gap-3">
+          <div className="flex items-center gap-4">
+            <MobileBackLink />
+            <div className="hidden sm:flex items-center">
+              {headerAvatars.length > 0 ? (
+                headerAvatars.map((src, index) => (
+                  <div key={`${src}-${index}`} className={index === 0 ? "" : "-ml-2"}>
+                    <Avatar
+                      user={{
+                        name: CHAT_PAGE_COPY.stackAvatarPlaceholderName,
+                        avatarUrl: src,
+                      }}
+                      size="sm"
+                    />
+                  </div>
+                ))
+              ) : (
+                <Avatar user={{ name: activeConversation.title }} size="sm" />
+              )}
+              {overflowCount > 0 ? (
+                <Typography
+                  component="span"
+                  className="-ml-2 grid h-8 min-w-8 place-items-center rounded-full border border-blue-400 px-2 font-semibold text-[#e5efff]"
+                >
+                  +{overflowCount}
+                </Typography>
+              ) : null}
+            </div>
+            <div>
+              <Typography component="h2" variantStyle="subtitle" className="text-sm">
+                {activeConversation.title}
+              </Typography>
+              {presenceOnlineCount != null ? (
+                <Typography component="p" variantStyle="caption" className="text-xs text-[#1bd695]">
+                  {presenceOnlineCount} online
+                </Typography>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              type="button"
+              variant="text"
+              color="error"
+              disabled={leaveBusy}
+              onClick={() => void leave()}
+            >
+              <BiExit className="text-sm" />
+              {leaveLabel}
+            </Button>
+            {leaveError ? (
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="max-w-48 text-right text-red-200/90"
+              >
+                {leaveError}
+              </Typography>
+            ) : null}
+          </div>
+        </div>
+      </header>
+
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        {messagesLoading ? (
+          <div className="flex h-full items-center justify-center px-4 py-8">
+            <Typography component="p" variantStyle="caption" className="text-white/60">
+              Loading messages…
+            </Typography>
+          </div>
+        ) : messagesError ? (
+          <div className="flex h-full flex-col items-center justify-center gap-2 px-4 py-8">
+            <Typography
+              component="p"
+              variantStyle="caption"
+              className="text-center text-red-200/90"
+            >
+              {messagesError}
+            </Typography>
+          </div>
+        ) : (
+          <div
+            ref={messagesScrollRef}
+            onScroll={handleMessagesScroll}
+            className="hide-scrollbar h-full space-y-4 overflow-y-auto px-4 py-5"
+          >
+            {socketConnectionError ? (
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="mb-2 text-center text-amber-200/90"
+              >
+                {socketConnectionError}
+              </Typography>
+            ) : null}
+            {socketRoomError ? (
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="mb-2 text-center text-red-200/90"
+              >
+                {socketRoomError}
+              </Typography>
+            ) : null}
+            {loadOlderError ? (
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="mb-2 text-center text-red-200/90"
+              >
+                {loadOlderError}
+              </Typography>
+            ) : null}
+            {loadingOlder ? (
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="mb-2 text-center text-white/45"
+              >
+                Loading older messages…
+              </Typography>
+            ) : null}
+            {messages.length === 0 ? (
+              <Typography
+                component="p"
+                variantStyle="caption"
+                className="text-center text-white/50"
+              >
+                No messages yet. Say hello.
+              </Typography>
+            ) : (
+              messages.map((message) => <MessageBubble key={message.id} message={message} />)
+            )}
+          </div>
+        )}
+      </div>
+
+      <ChatCompose
+        onSend={send}
+        disabled={messagesLoading || Boolean(messagesError)}
+        isSending={isSending}
+        sendError={sendError}
+        typingHint={othersTyping ? CHAT_PAGE_COPY.typingOthers : null}
+        onTypingActivity={notifyTypingActivity}
+      />
+    </div>
   );
 }

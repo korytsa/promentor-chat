@@ -5,6 +5,7 @@ on:
     branches: [main, dev]
   pull_request:
     branches: [main, dev]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -43,3 +44,6 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Unit + Integration tests
+        run: pnpm test

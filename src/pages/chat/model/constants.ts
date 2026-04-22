@@ -1,23 +1,50 @@
-export const CONVERSATIONS = [
-  { id: "1", title: "Frontend Interview Prep", updatedAt: "2 min ago" },
-  { id: "2", title: "Workout Routine Ideas", updatedAt: "19 min ago" },
-  { id: "3", title: "Weekly Goal Planning", updatedAt: "1 hr ago" },
-];
+export const CHAT_PAGE_COPY = {
+  stackAvatarPlaceholderName: "Team member",
+  overflowCountLabel: "+8",
+  typingOthers: "Someone is typing…",
+  leaveDirect: "Leave chat",
+  leaveGroup: "Leave group",
+} as const;
 
-export const MESSAGES = [
-  {
-    id: "m1",
-    role: "assistant",
-    text: "Hi! I can help you map your week. Want to prioritize learning, fitness, or networking first?",
-  },
-  {
-    id: "m2",
-    role: "user",
-    text: "Let's start with learning. I have 90 minutes each day.",
-  },
-  {
-    id: "m3",
-    role: "assistant",
-    text: "Great. I recommend 45 minutes coding practice, 30 minutes review, and 15 minutes notes.",
-  },
-];
+export const CHAT_MESSAGE_PAGE_SIZE = 30;
+export const CHAT_TYPING_IDLE_MS = 1800;
+export const CHAT_SCROLL_LOAD_TOP_PX = 72;
+export const CHAT_READ_SCROLL_BOTTOM_PX = 96;
+export const CHAT_READ_SCROLL_DEBOUNCE_MS = 320;
+
+export const CHAT_ROOM_LOAD_MESSAGES_FAILURE = {
+  fallback: "Could not load messages.",
+  unauthorized: "Sign in to view messages.",
+} as const;
+
+export const CHAT_ROOM_LOAD_OLDER_FAILURE = {
+  fallback: "Could not load older messages.",
+  unauthorized: "Sign in to load messages.",
+} as const;
+
+export const CHAT_ROOM_SEND_MESSAGE_FAILURE = {
+  fallback: "Could not send message.",
+  unauthorized: "Sign in to send messages.",
+} as const;
+
+export const CHAT_LEAVE_ROOM_FAILURE = {
+  fallback: "Could not leave this chat.",
+  unauthorized: "Sign in to leave this chat.",
+  notFound: "This chat is no longer available.",
+} as const;
+
+export const CHAT_SEARCH_DM_FAILURE = {
+  fallback: "Could not start a direct chat.",
+  unauthorized: "Sign in to start a chat.",
+} as const;
+
+export const CHAT_SIDEBAR_USER_SEARCH_FAILURE = {
+  fallback: "Could not search users.",
+  unauthorized: "Sign in to search users.",
+  rateLimited: "Too many searches. Wait a moment and try again.",
+} as const;
+
+export const CHAT_SIDEBAR_USERS_DIRECTORY_FAILURE = {
+  fallback: "Could not load people.",
+  unauthorized: "Sign in to see people.",
+} as const;

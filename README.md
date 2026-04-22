@@ -6,7 +6,7 @@ Remote app for Promentor microfrontend architecture.
 
 - [promentor](https://github.com/korytsa/promentor)
 - [promentor-chat](https://github.com/korytsa/promentor-chat)
-- [promentor-coaching](https://github.com/korytsa/promentor-coaching)
+- [promentor-coaching](https://github.com/Webprojon/promentor-coaching)
 
 ## Status
 
